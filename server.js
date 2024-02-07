@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 
 const app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({ extended: true})); // check for config
 app.use(cookieParser());
 app.use(express.json());
 
