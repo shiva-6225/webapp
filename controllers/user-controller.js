@@ -1,4 +1,4 @@
-import { setResponseWithData, setErrorResponse } from "./response-handler.js";
+import { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } from "./response-handler.js";
 import { register, fetchUser, updateUser } from "../services/user-service.js";
 
 export const createUser = async (req, res) => {
@@ -14,7 +14,7 @@ export const createUser = async (req, res) => {
             const newUser = await register(user);
             const data = { ...newUser.toJSON() };
             delete data.password;
-            res.status(201).json();
+            setUserAPIResponseWithData(data, req, res, 201);
         }
     }
     catch (err) {
@@ -32,7 +32,7 @@ export const getUser = async (req, res) => {
             if (userDetails.success) {
                 const userInfo = { ...userDetails.user.toJSON() };
                 delete userInfo.password;
-                setResponseWithData(userInfo, res);
+                setUserAPIResponseWithData(userInfo, req, res, 200);
             } else {
                 res.status(401).send();
             }
@@ -57,7 +57,7 @@ export const updateUserInfo = async (req, res) => {
                 const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
                 const [username, password] = credentials.split(':');
                 const updateResponse = await updateUser(username, password, updateInfo);
-                res.status(updateResponse.status).send();
+                setUserAPIResponse(req, res, updateResponse.status);
             }
             res.status(401).send();
         }
