@@ -12,7 +12,7 @@ export const setResponse = (request, response) => {
 };
 
 export const setResponseWithData = (data, response) => {
-    response.status(200).json();
+    response.status(200).json(data);
 };
 
 
