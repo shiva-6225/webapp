@@ -1,4 +1,3 @@
-import { DataTypes } from "sequelize";
 import User from "../models/user.js";
 import bcrypt from 'bcrypt';
 
@@ -39,7 +38,7 @@ export const updateUser = async (username, oldPassword, userDetails) => {
         if (passwordMatched) {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-            await User.update({ first_name: firstname, last_name: lastname, password: hashedPassword, account_updated : DataTypes.NOW() }, { where: { username } });
+            await User.update({ first_name: firstname, last_name: lastname, password: hashedPassword, account_updated : Date.now() }, { where: { username } });
             return { status: 201 }
         } else {
             return { status: 401 }

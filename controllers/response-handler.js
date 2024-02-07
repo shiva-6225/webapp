@@ -11,10 +11,19 @@ export const setResponse = (request, response) => {
     }
 };
 
-export const setResponseWithData = (data, response) => {
-    response.status(200).json(data);
+export const setUserAPIResponseWithData = (data, request, response, status) => {
+    if(Object.keys(request.cookies).length > 0){
+        response.status(400).json();
+    }
+    response.status(status).json(data);
 };
 
+export const setUserAPIResponse = (request, response, status) => {
+    if(Object.keys(request.cookies).length > 0){
+        response.status(400).json();
+    }
+    response.status(status).json();
+};
 
 
 export const setErrorResponse = (err, response) => {
