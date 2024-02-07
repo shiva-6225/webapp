@@ -1,5 +1,6 @@
 import { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } from "./response-handler.js";
 import { register, fetchUser, updateUser } from "../services/user-service.js";
+import { isEmail } from '../helpers/email-validation.js';
 
 export const createUser = async (req, res) => {
     try {
@@ -7,6 +8,9 @@ export const createUser = async (req, res) => {
         if (!user || Object.keys(user).length === 0 || user.username === undefined || user.password === undefined) {
             res.status(400).send();
         } else {
+            if (!isEmail(user.username)) {
+                res.status(400).send();
+            }
             const existingUser = await fetchUser(user.username, user.password);
             if (existingUser.success) {
                 res.status(400).send();
