@@ -4,13 +4,17 @@ import { register, fetchUser, updateUser } from "../services/user-service.js";
 export const createUser = async (req, res) => {
     try {
         const user = req.body;
-        if (!user || Object.keys(user).length === 0) {
+        if (!user || Object.keys(user).length === 0 || user.username === undefined || user.password === undefined) {
             res.status(400).send();
         } else {
+            const existingUser = await fetchUser(user.username, user.password);
+            if (existingUser.success) {
+                res.status(400).send();
+            }
             const newUser = await register(user);
             const data = { ...newUser.toJSON() };
             delete data.password;
-            res.status(201).json(data);
+            res.status(201).json();
         }
     }
     catch (err) {
@@ -20,18 +24,20 @@ export const createUser = async (req, res) => {
 
 export const getUser = async (req, res) => {
     try {
-        const user = req.body;
-        if (user) {
-            const userDetails = await fetchUser(user);
+        if (req.headers.authorization && req.headers.authorization.startsWith('Basic ')) {
+            const base64Credentials = req.headers.authorization.split(' ')[1];
+            const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+            const [username, password] = credentials.split(':');
+            const userDetails = await fetchUser(username, password);
             if (userDetails.success) {
                 const userInfo = { ...userDetails.user.toJSON() };
                 delete userInfo.password;
                 setResponseWithData(userInfo, res);
             } else {
-                res.status(204).send() // status code here
+                res.status(401).send();
             }
         } else {
-            res.status(204).send(); // find right status code
+            res.status(401).send();
         }
     }
     catch (err) {
@@ -41,21 +47,19 @@ export const getUser = async (req, res) => {
 
 export const updateUserInfo = async (req, res) => {
     try {
-        const user = req.body;
-        if (!user || Object.keys(user).length === 0) {
-            res.status(204).send();
+        const updateInfo = req.body;
+        const updateOnly = ['firstname', 'lastname', 'password'];
+        if (!updateInfo || Object.keys(updateInfo).length === 0 || Object.keys(updateInfo).some(key => !updateOnly.includes(key))) {
+            res.status(400).send();
         } else {
-
-            const updateResponse = await updateUser(user);
-            if (updateResponse.success) {
-                const userInfo = { ...updateResponse.updatedUser.toJSON() };
-                delete userInfo.id;
-                delete userInfo.account_created;
-                delete userInfo.account_updated;
-                setResponseWithData(userInfo, res);
+            if (req.headers.authorization && req.headers.authorization.startsWith('Basic ')) {
+                const base64Credentials = req.headers.authorization.split(' ')[1];
+                const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+                const [username, password] = credentials.split(':');
+                const updateResponse = await updateUser(username, password, updateInfo);
+                res.status(updateResponse.status).send();
             }
-            setResponseWithData(updateResponse.message, res);
-
+            res.status(401).send();
         }
 
     }
