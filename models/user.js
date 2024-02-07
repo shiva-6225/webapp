@@ -5,10 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 const User = sequelize.define('User', {
     id: {
         type: DataTypes.UUID,
-        defaultValue: ()=>uuidv4(),
+        defaultValue: () => uuidv4(),
         allowNull: false,
         unique: true,
-        primaryKey: true
+        primaryKey: true,
     },
     first_name: {
         type: DataTypes.STRING,
@@ -17,7 +17,7 @@ const User = sequelize.define('User', {
     },
     last_name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: false,
     },
     username: {
@@ -28,7 +28,7 @@ const User = sequelize.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false
+        unique: false,
     },
     account_created: {
         type: DataTypes.DATE,
@@ -46,7 +46,12 @@ const User = sequelize.define('User', {
     timestamps: false, // Disable createdAt and updatedAt
     indexes: [
         { unique: true, fields: ['username'] } // This adds a unique constraint to the database table
-    ]
+    ],
 });
+
+// User.addHook('beforeUpdate',(user, options)=>{
+//     console.log('created!!!!!!!!!!!!!!!');
+//     user.account_updated = DataTypes.NOW();
+// });
 
 export default User;
