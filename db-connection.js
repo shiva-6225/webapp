@@ -1,12 +1,11 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { databaseConfig } from './db-config.js';
-import { config } from 'dotenv';
+const { DataTypes, Sequelize } = require('sequelize');
+const { databaseConfig } = require('./db-config.js');
+const { config } = require('dotenv');
 
 config();
 const db = process.env.DB_NAME;
-const user = process.env.USER;
-const password = process.env.PASSWORD;
-
+const user = process.env.DB_USER;
+const password = process.env.DB_PASSWORD;
 const sequelize = new Sequelize(db, user, password, databaseConfig, {
     define: {
         hooks: {
@@ -17,4 +16,4 @@ const sequelize = new Sequelize(db, user, password, databaseConfig, {
     }
 });
 
-export default sequelize;
+module.exports = sequelize;
