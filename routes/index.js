@@ -1,9 +1,9 @@
-import connectionRouter from './connection-route.js';
-import userRouter from './user-route.js';
-import { handleRouteResponse } from '../controllers/response-handler.js';
+const connectionRouter = require('./connection-route.js');
+const userRouter = require('./user-route.js');
+const { handleRouteResponse } = require('../controllers/response-handler.js');
 
-export default (app) => {
+module.exports = (app) => {
     // app.use(handleRouteResponse);
     app.use('/healthz', connectionRouter);
     app.use('/v1/user/self', userRouter);
-}
+};

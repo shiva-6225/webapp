@@ -1,7 +1,7 @@
-import sequelize from "../db-connection.js";
-import { setResponse, setErrorResponse } from "./response-handler.js";
+const sequelize = require("../db-connection.js");
+const { setResponse, setErrorResponse } = require("./response-handler.js");
 
-export const connectDB = async (req, res) => {
+exports.connectDB = async (req, res) => {
     try {
         await sequelize.authenticate();
         setResponse(req, res);

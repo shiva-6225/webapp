@@ -1,8 +1,8 @@
-import { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } from "./response-handler.js";
-import { register, fetchUser, updateUser } from "../services/user-service.js";
-import { isEmail } from '../helpers/email-validation.js';
+const { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } = require("./response-handler.js");
+const { register, fetchUser, updateUser } = require("../services/user-service.js");
+const { isEmail } = require('../helpers/email-validation.js');
 
-export const createUser = async (req, res) => {
+exports.createUser = async (req, res) => {
     try {
         const user = req.body;
         if (!user || Object.keys(user).length === 0 || user.username === undefined || user.password === undefined) {
@@ -24,9 +24,9 @@ export const createUser = async (req, res) => {
     catch (err) {
         setErrorResponse(err, res);
     }
-}
+};
 
-export const getUser = async (req, res) => {
+exports.getUser = async (req, res) => {
     try {
         if (req.headers.authorization && req.headers.authorization.startsWith('Basic ')) {
             const base64Credentials = req.headers.authorization.split(' ')[1];
@@ -45,11 +45,11 @@ export const getUser = async (req, res) => {
         }
     }
     catch (err) {
-        setErrorResponse(err, res)
+        setErrorResponse(err, res);
     }
-}
+};
 
-export const updateUserInfo = async (req, res) => {
+exports.updateUserInfo = async (req, res) => {
     try {
         const updateInfo = req.body;
         const updateOnly = ['firstname', 'lastname', 'password'];
@@ -62,12 +62,12 @@ export const updateUserInfo = async (req, res) => {
                 const [username, password] = credentials.split(':');
                 const updateResponse = await updateUser(username, password, updateInfo);
                 setUserAPIResponse(req, res, updateResponse.status);
+            } else {
+                res.status(401).send();
             }
-            res.status(401).send();
         }
-
     }
     catch (err) {
         setErrorResponse(err, res);
     }
-}
+};

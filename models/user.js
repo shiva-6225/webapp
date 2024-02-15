@@ -1,6 +1,6 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../db-connection.js';
-import { v4 as uuidv4 } from 'uuid';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db-connection.js');
+const { v4: uuidv4 } = require('uuid');
 
 const User = sequelize.define('User', {
     id: {
@@ -54,4 +54,4 @@ const User = sequelize.define('User', {
 //     user.account_updated = DataTypes.NOW();
 // });
 
-export default User;
+module.exports = User;
