@@ -17,7 +17,7 @@ sudo systemctl enable mysql
 sudo mysql -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
 
 # Create database named "CSYE"
-sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABSE};"
+sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABSE};"
 
 # Install Node and npm
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
