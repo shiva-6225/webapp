@@ -24,23 +24,15 @@
         #   uses: shogo82148/actions-setup-mysql@v1
         #   with:
         #     mysql-version: "8.0"
-        - name: List files in packer directory
-          run: |
-            ls -la ./packer
-
-        - name: Remove carriage return characters from shell script
-          run: |
-            tr -d '\r' < ./packer/install-dependencies.sh > ./packer/install-dependencies-unix.sh
-
-
+        
         - name: Set up MySQL and create database
           run: |
             export MYSQL_USERNAME="${{ secrets.MYSQL_USERNAME }}"
             export MYSQL_SERVER_URL="${{ secrets.MYSQL_SERVER_URL }}"
             export MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}"
             export MYSQL_DATABASE="${{ secrets.MYSQL_DATABASE }}"
-            chmod +x ./packer/install-dependencies-unix.sh
-            ./packer/install-dependencies-unix.sh
+            chmod +x ./packer/install-dependencies.sh
+            ./packer/install-dependencies.sh
 
         # - name: Install dependencies
         #   run: npm install

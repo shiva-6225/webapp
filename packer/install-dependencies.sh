@@ -2,10 +2,10 @@
 set -e
 
 # Update package repos
-sudo yum update -y
+sudo apt update -y
 
 # Install MySQL server
-sudo yum install -y mysql-server
+sudo apt install -y mysql-server
 
 # Start MySQL service
 sudo systemctl start mysqld
@@ -17,11 +17,11 @@ sudo systemctl enable mysqld
 sudo mysql -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
 
 # Create database named "CSYE"
-sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS CSYE6225;"
+sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABSE};"
 
 # Install Node and npm
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
-sudo yum install -y nodejs
+sudo apt install -y nodejs
 
 # Install project dependencies
 cd ../
