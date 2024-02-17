@@ -8,10 +8,12 @@ sudo apt update -y
 sudo apt install -y mysql-server
 
 # Start MySQL service
-sudo systemctl start mysqld
+sudo systemctl start mysql
 
 # Enable MySQL to start on boot
-sudo systemctl enable mysqld
+sudo systemctl enable mysql
+
+ls /etc/systemd/system/mysqld.service
 
 # Set MySQL root password
 sudo mysql -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
