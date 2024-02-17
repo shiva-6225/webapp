@@ -1,0 +1,23 @@
+{
+    "builders": [
+      {
+        "type": "googlecompute",
+        "project_id": "webapp-413805",
+        "source_image_family":"centos-stream-8",
+        "image_name": "centos-machine-image",
+        "zone": "us-east1",
+        "network": "default"
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "shell",
+        "script": "install_dependencies.sh"
+      },
+      {
+        "type": "shell",
+        "script": "configure_services.sh"
+      }
+    ]
+  }
+  
