@@ -20,26 +20,21 @@
         - name: Checkout code
           uses: actions/checkout@v2
 
-        - name: Set up MySQL client
-          uses: shogo82148/actions-setup-mysql@v1
-          with:
-            mysql-version: "8.0"
+        # - name: Set up MySQL client
+        #   uses: shogo82148/actions-setup-mysql@v1
+        #   with:
+        #     mysql-version: "8.0"
 
-        - name: Set MySQL Root Password
+        - name: Set up MySQL and create database
           run: |
-            mysql -u ${{ secrets.MYSQL_USERNAME }} --skip-password -e "ALTER USER ${{ secrets.MYSQL_USERNAME }}@${{ secrets.MYSQL_SERVER_URL }} IDENTIFIED BY '${{ secrets.MYSQL_PASSWORD }}';"
-        
-        - name: Create Database
-          run: |
-            mysql -u ${{ secrets.MYSQL_USERNAME }} -p"${{ secrets.MYSQL_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.MYSQL_DATABASE }};"
+            export MYSQL_USERNAME="${{ secrets.MYSQL_USERNAME }}"
+            export MYSQL_SERVER_URL="${{ secrets.MYSQL_SERVER_URL }}"
+            export MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}"
+            export MYSQL_DATABASE="${{ secrets.MYSQL_DATABASE }}"
+            ../packer/install-dependencies.sh
 
-        - name: Echo Databases
-          run: |
-            echo "Databases in MySQL Server:"
-            mysql -u ${{ secrets.MYSQL_USERNAME }} -p"${{ secrets.MYSQL_PASSWORD }}" -e "SHOW DATABASES;"
-
-        - name: Install dependencies
-          run: npm install
+        # - name: Install dependencies
+        #   run: npm install
 
         - name: Connect to MySQL
           run: |
