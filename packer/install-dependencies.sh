@@ -13,22 +13,11 @@ sudo systemctl start mysqld
 # Enable MySQL to start on boot
 sudo systemctl enable mysqld
 
-# Secure MySQL installation (set root password, remove anonymous users, etc.)
-sudo mysql_secure_installation <<EOF
-y  # Answer 'yes' to set up the Validate Password Plugin
-${MYSQL_ROOT_PASSWORD}  # Set root password to the value of MYSQL_ROOT_PASSWORD environment variable
-${MYSQL_ROOT_PASSWORD}  # Confirm root password
-y  # Remove anonymous users
-y  # Disallow root login remotely
-y  # Remove the test database and access to it
-y  # Reload the privilege tables now
-EOF
+# Set MySQL root password
+sudo mysql -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
 
-# Run SQL queries to set MySQL user password and create database
-mysql -u root -p"${MYSQL_ROOT_PASSWORD}" <<MYSQL_SCRIPT
-ALTER USER '${MYSQL_USERNAME}'@'${MYSQL_SERVER_URL}' IDENTIFIED BY '${MYSQL_PASSWORD}';
-CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
-MYSQL_SCRIPT
+# Create database named "CSYE"
+sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS CSYE6225;"
 
 # Install Node and npm
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
