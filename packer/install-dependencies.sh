@@ -26,8 +26,3 @@ sudo yum install -y nodejs
 # Install project dependencies
 cd ../
 npm install
-
-
-
-
-
