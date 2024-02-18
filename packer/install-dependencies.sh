@@ -2,26 +2,37 @@
 set -e
 
 # Update package repos
-sudo yum update -y
+sudo apt update -y
 
 # Install MySQL server
-sudo yum install -y mysql-server
+sudo apt install -y mysql-server
 
 # Start MySQL service
-sudo systemctl start mysqld
+sudo systemctl start mysql
 
 # Enable MySQL to start on boot
-sudo systemctl enable mysqld
+sudo systemctl enable mysql
 
-# Set MySQL root password
-sudo mysql -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
+# # Start MySQL in safe mode without loading the grant tables and skip networking
+# sudo /usr/sbin/mysqld --skip-grant-tables --skip-networking &
 
-# Create database named "CSYE"
-sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS CSYE6225;"
+# # Sleep to ensure MySQL has started
+# sleep 5
+
+# # Connect to MySQL
+# sudo mysql -u "${MYSQL_USERNAME}" <<EOF
+# FLUSH PRIVILEGES;
+# ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY 7758015455.Abde;
+# FLUSH PRIVILEGES;
+# EXIT;
+# EOF
+
+# # Create database
+# sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABSE};"
 
 # Install Node and npm
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
-sudo yum install -y nodejs
+sudo apt install -y nodejs
 
 # Install project dependencies
 cd ../
