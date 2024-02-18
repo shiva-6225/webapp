@@ -1,0 +1,32 @@
+name: Packer Validation Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  packer_validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
+
+      - name: Format Packer template
+        run: |
+          packer fmt ./packer/packer.json
+          # Check if there are changes after formatting
+          if [[ -n "$(git diff --exit-code)" ]]; then
+            echo "::error::Packer template has been modified by packer fmt. Please fix and commit the changes."
+            exit 1
+          fi
+
+      - name: Validate Packer template
+        run: packer validate ./packer/packer.json
