@@ -14,7 +14,7 @@ sudo systemctl start mysql
 sudo systemctl enable mysql
 
 # Set MySQL root password
-sudo mysql -u "${MYSQL_USERNAME}" --skip-password -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
+sudo mysql -u "${MYSQL_USERNAME}" --password="" -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
 
 # Create database named "CSYE"
 sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABSE};"
