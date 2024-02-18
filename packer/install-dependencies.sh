@@ -16,15 +16,16 @@ sudo systemctl enable mysql
 # Check if password is already set for root user
 PASSWORD_SET=$(sudo mysql -u"${MYSQL_USERNAME}" -sse "SELECT COUNT(*) FROM mysql.user WHERE user = '${MYSQL_USERNAME}' AND host = '${MYSQL_SERVER_URL}' AND authentication_string != '';")
 if [ "${PASSWORD_SET}" -gt 0 ]; then
-  echo "Password is already set for root user."
+  echo "::set-output name=password_already_set::true"
 else
+  echo "::set-output name=password_already_set::false"
   echo "Setting password for root user..."
   # Set MySQL root password
   sudo mysql -u "${MYSQL_USERNAME}" -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
   
   # Check if the password was set correctly
   MYSQL_COMMAND="mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e\"SELECT 'Password set successfully'\""
-  if eval "${MYSQL_COMMAND}" &> /dev/null; then
+  if eval "${MYSQL_COMMAND}"; then
     echo "Password for root user set successfully."
   else
     echo "Failed to set password for root user."
