@@ -20,7 +20,7 @@ sudo /usr/sbin/mysqld --skip-grant-tables --skip-networking &
 sleep 5
 
 # Connect to MySQL
-mysqladmin -u "${MYSQL_USERNAME}" <<EOF
+sudo mysql -u "${MYSQL_USERNAME}" <<EOF
 FLUSH PRIVILEGES;
 ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';
 FLUSH PRIVILEGES;
