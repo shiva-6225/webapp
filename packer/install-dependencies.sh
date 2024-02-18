@@ -13,22 +13,22 @@ sudo systemctl start mysql
 # Enable MySQL to start on boot
 sudo systemctl enable mysql
 
-# Function to reset MySQL root password
-reset_mysql_password() {
-    sudo mysql -u "${MYSQL_USERNAME}" <<EOF
+# Start MySQL in safe mode without loading the grant tables and skip networking
+sudo /usr/sbin/mysqld --skip-grant-tables --skip-networking &
+
+# Sleep to ensure MySQL has started
+sleep 5
+
+# Connect to MySQL
+mysql -u "${MYSQL_USERNAME}" <<EOF
 FLUSH PRIVILEGES;
-use mysql;
-UPDATE user SET authentication_string=PASSWORD("${MYSQL_PASSWORD}") WHERE user="${MYSQL_USERNAME}";
+ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';
 FLUSH PRIVILEGES;
 EXIT;
 EOF
-}
 
-# Set MySQL root password
-reset_mysql_password
-
-# Create database named "CSYE"
-sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
+# Create database
+sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABSE};"
 
 # Install Node and npm
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
@@ -38,4 +38,7 @@ sudo apt install -y nodejs
 cd ../
 npm install
 
-echo "MySQL root password has been successfully reset."
+
+
+
+
