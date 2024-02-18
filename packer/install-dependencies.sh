@@ -13,30 +13,22 @@ sudo systemctl start mysql
 # Enable MySQL to start on boot
 sudo systemctl enable mysql
 
-# Check if password is already set for root user
-PASSWORD_SET=$(sudo mysql -u"${MYSQL_USERNAME}" -sse "SELECT COUNT(*) FROM mysql.user WHERE user = '${MYSQL_USERNAME}' AND host = '${MYSQL_SERVER_URL}' AND authentication_string != '';")
-if [ "${PASSWORD_SET}" -gt 0 ]; then
-  echo "::set-output name=password_already_set::true"
-else
-  echo "::set-output name=password_already_set::false"
-  echo "Setting password for root user..."
-  # Set MySQL root password
-  sudo mysql -u "${MYSQL_USERNAME}" -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
-  
-  # Check if the password was set correctly
-  MYSQL_COMMAND="mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e\"SELECT 'Password set successfully'\""
-  if eval "${MYSQL_COMMAND}"; then
-    echo "Password for root user set successfully."
-  else
-    echo "Failed to set password for root user."
-  fi
-fi
+# Function to reset MySQL root password
+reset_mysql_password() {
+    sudo mysql -u "${MYSQL_USERNAME}" <<EOF
+FLUSH PRIVILEGES;
+use mysql;
+UPDATE user SET authentication_string=PASSWORD("${MYSQL_PASSWORD}") WHERE user="${MYSQL_USERNAME}";
+FLUSH PRIVILEGES;
+EXIT;
+EOF
+}
 
 # Set MySQL root password
-# sudo mysql -u "${MYSQL_USERNAME}" -e "ALTER USER ${MYSQL_USERNAME}@${MYSQL_SERVER_URL} IDENTIFIED BY '${MYSQL_PASSWORD}';"
+reset_mysql_password
 
 # Create database named "CSYE"
-sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABSE};"
+sudo mysql -u "${MYSQL_USERNAME}" -p"${MYSQL_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
 
 # Install Node and npm
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
@@ -46,7 +38,4 @@ sudo apt install -y nodejs
 cd ../
 npm install
 
-
-
-
-
+echo "MySQL root password has been successfully reset."
