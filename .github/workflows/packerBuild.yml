@@ -45,7 +45,7 @@ jobs:
       - name: List contents of the directory
         run: |
             cd /home/runner/work/webapp/webapp
-            ls -la ${{ env.WEBAPP_ZIP_PATH }}
+            ls -la
 
       - name: Run Packer build
         run: |
