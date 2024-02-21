@@ -37,22 +37,22 @@ jobs:
         id: zip
 
       - name: Set output variable
-        run: echo "WEBAPP_ZIP_PATH=/home/runner/work/webapp/webapp/webapp.zip" >> $GITHUB_ENV
+        run: echo "WEBAPP_ZIP_PATH=/home/runner/work/webapp/webapp.zip" >> $GITHUB_ENV
 
       - name: Print WEBAPP_ZIP_PATH
         run: echo "WEBAPP_ZIP_PATH=${{ env.WEBAPP_ZIP_PATH }}"
 
       - name: List contents of the directory
         run: |
-            cd /home/runner/work/webapp/webapp
+            cd /home/runner/work/webapp
             ls -la
 
       - name: Run Packer build
         run: |
           packer init packer.pkr.hcl
           packer build \
-          -var 'auth_file=data.json' \
-          -var 'project_path=${{ env.WEBAPP_ZIP_PATH }}' \
+          -var 'auth_file=./data.json' \
+          -var 'project_path=/home/runner/work/webapp/webapp/webapp.zip' \
           -var 'MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}' \
           -var 'MYSQL_SERVER_URL=${{ secrets.MYSQL_SERVER_URL }}' \
           -var 'MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}' \
