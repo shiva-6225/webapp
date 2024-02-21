@@ -43,8 +43,10 @@ jobs:
         run: echo "WEBAPP_ZIP_PATH=${{ env.WEBAPP_ZIP_PATH }}"
 
       - name: List contents of the directory
-        run: ls -la ${{ env.WEBAPP_ZIP_PATH }}
-        
+        run: |
+            cd /home/runner/work/webapp/webapp
+            ls -la ${{ env.WEBAPP_ZIP_PATH }}
+
       - name: Run Packer build
         run: |
           packer init packer.pkr.hcl
