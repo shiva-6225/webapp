@@ -1,4 +1,4 @@
-name: Packer Validation Workflow
+name: Packer Build Workflow
 
 on:
   pull_request:
@@ -41,7 +41,7 @@ jobs:
 
       - name: Run Packer build
         run: |
-          packer init
+          packer init packer.pkr.hcl
           packer build \
           -var 'auth_file=data.json' \
           -var 'project_path=${{ env.WEBAPP_ZIP_PATH }}' \
