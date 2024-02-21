@@ -40,7 +40,6 @@ jobs:
         run: |
             cd /home/runner/work/webapp/webapp
             ls -la
-            cat data.json
 
       - name: Run Packer build
         run: |
