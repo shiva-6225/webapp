@@ -44,14 +44,15 @@ jobs:
 
       - name: List contents of the directory
         run: |
-            cd /home/runner/work/webapp
+            cd /home/runner/work/webapp/webapp
             ls -la
+            cat data.json
 
       - name: Run Packer build
         run: |
           packer init packer.pkr.hcl
           packer build \
-          -var 'auth_file=./data.json' \
+          -var 'auth_file=/home/runner/work/webapp/webapp/data.json' \
           -var 'project_path=/home/runner/work/webapp/webapp.zip' \
           -var 'MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}' \
           -var 'MYSQL_SERVER_URL=${{ secrets.MYSQL_SERVER_URL }}' \
