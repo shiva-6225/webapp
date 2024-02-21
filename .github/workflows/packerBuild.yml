@@ -52,7 +52,7 @@ jobs:
           packer init packer.pkr.hcl
           packer build \
           -var 'auth_file=./data.json' \
-          -var 'project_path=/home/runner/work/webapp/webapp/webapp.zip' \
+          -var 'project_path=/home/runner/work/webapp/webapp.zip' \
           -var 'MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}' \
           -var 'MYSQL_SERVER_URL=${{ secrets.MYSQL_SERVER_URL }}' \
           -var 'MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}' \
