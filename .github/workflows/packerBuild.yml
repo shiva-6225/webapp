@@ -17,18 +17,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install jq
+      
+      - name: Decode JSON secret
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-          
-      - name: Convert JSON string to JSON object and write to file
-        run: |
-          echo "${{ secrets.YOUR_JSON_SECRET }}" > data.json
-          jq '.' data.json > keys.json
-          mv keys.json data.json
+          echo "${{ secrets.JSON_SECRET }}" | base64 --decode > data.json
           cat data.json
+        
 
       - name: Zip project
         run: |
@@ -52,7 +46,7 @@ jobs:
         run: |
           packer init packer.pkr.hcl
           packer build \
-          -var 'auth_file=/home/runner/work/webapp/webapp/data.json' \
+          -var 'auth_file=data.json' \
           -var 'project_path=/home/runner/work/webapp/webapp.zip' \
           -var 'MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}' \
           -var 'MYSQL_SERVER_URL=${{ secrets.MYSQL_SERVER_URL }}' \
