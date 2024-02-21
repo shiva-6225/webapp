@@ -62,7 +62,7 @@ variable "project_path" {
   default = ""
 }
 variable "auth_file" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -85,11 +85,11 @@ build {
   }
   provisioner "shell" {
     environment_vars = [
-    "MYSQL_USERNAME=${var.MYSQL_USERNAME}",
-    "MYSQL_PASSWORD=${var.MYSQL_PASSWORD}",
-    "MYSQL_SERVER_URL=${var.MYSQL_SERVER_URL}",
-    "MYSQL_DATABASE=${var.MYSQL_DATABASE}",
-    "MYSQL_PORT=${var.MYSQL_PORT}"
+      "MYSQL_USERNAME=${var.MYSQL_USERNAME}",
+      "MYSQL_PASSWORD=${var.MYSQL_PASSWORD}",
+      "MYSQL_SERVER_URL=${var.MYSQL_SERVER_URL}",
+      "MYSQL_DATABASE=${var.MYSQL_DATABASE}",
+      "MYSQL_PORT=${var.MYSQL_PORT}"
     ]
     script = "./configure_services.sh"
   }
@@ -106,11 +106,11 @@ build {
 
   provisioner "shell" {
     environment_vars = [
-    "MYSQL_USERNAME=${var.MYSQL_USERNAME}",
-    "MYSQL_PASSWORD=${var.MYSQL_PASSWORD}",
-    "MYSQL_SERVER_URL=${var.MYSQL_SERVER_URL}",
-    "MYSQL_DATABASE=${var.MYSQL_DATABASE}",
-    "MYSQL_PORT=${var.MYSQL_PORT}"
+      "MYSQL_USERNAME=${var.MYSQL_USERNAME}",
+      "MYSQL_PASSWORD=${var.MYSQL_PASSWORD}",
+      "MYSQL_SERVER_URL=${var.MYSQL_SERVER_URL}",
+      "MYSQL_DATABASE=${var.MYSQL_DATABASE}",
+      "MYSQL_PORT=${var.MYSQL_PORT}"
     ]
     script = "./setupApp.sh"
   }
