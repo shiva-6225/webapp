@@ -44,7 +44,7 @@ jobs:
       - name: Run Packer build
         run: |
           packer init packer.pkr.hcl
-          packer build \
+          packer build --force \
           -var 'auth_file=data.json' \
           -var 'project_path=/home/runner/work/webapp/webapp.zip' \
           -var 'MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}' \
