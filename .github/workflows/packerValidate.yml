@@ -25,4 +25,10 @@ jobs:
           packer fmt -check packer.pkr.hcl
 
       - name: Validate Packer template
-        run: packer validate packer.pkr.hcl
+        run: |
+          packer validate \
+          -var 'project_id=${{ secrets.PROJECT_ID }}' \
+          -var 'gcp_zone=${{ secrets.GCP_ZONE }}' \
+          -var 'source_image=${{ secrets.SOURCE_IMAGE }}' \
+          -var 'ssh_username=${{ secrets.SSH_USERNAME }}' \
+          packer.pkr.hcl
