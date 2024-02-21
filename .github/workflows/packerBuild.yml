@@ -37,7 +37,7 @@ jobs:
         id: zip
 
       - name: Set output variable
-        run: echo "WEBAPP_ZIP_PATH=${{ github.workspace }}/webapp.zip" >> $GITHUB_ENV
+        run: echo "WEBAPP_ZIP_PATH=${{ github.workspace }}/webapp/webapp.zip" >> $GITHUB_ENV
 
       - name: Print WEBAPP_ZIP_PATH
         run: echo "WEBAPP_ZIP_PATH=${{ env.WEBAPP_ZIP_PATH }}"
