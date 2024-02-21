@@ -1,0 +1,18 @@
+[Unit]
+Description=CSYE 6225 App
+After=network.target
+Wants=cloud-init.target
+
+[Service]
+User=csye6225
+Group=csye6225
+WorkingDirectory=/home/packer/webapp
+ExecStart=/bin/node /home/packer/webapp/server.js
+Restart=always
+RestartSec=15
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=webapp
+
+[Install]
+WantedBy=multi-user.target

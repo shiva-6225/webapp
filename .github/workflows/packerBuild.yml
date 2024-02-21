@@ -1,0 +1,58 @@
+name: Packer Validation Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  Artifact_Config_Setup:
+    runs-on: ubuntu-latest
+    env:
+        DB_HOST: ${{ secrets.MYSQL_SERVER_URL }}
+        DB_USER: ${{ secrets.MYSQL_USERNAME }}
+        DB_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        DB_NAME: ${{ secrets.MYSQL_DATABASE }}
+        DB_PORT: ${{ secrets.MYSQL_PORT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          
+      - name: Convert JSON string to JSON object and write to file
+        run: |
+          echo "${{ secrets.YOUR_JSON_SECRET }}" > data.json
+          jq '.' data.json > keys.json
+          mv keys.json data.json
+          cat data.json
+
+      - name: Zip project
+        run: |
+          zip -r webapp.zip .
+        working-directory: ../
+        id: zip
+
+      - name: Set output variable
+        run: echo "WEBAPP_ZIP_PATH=${{ github.workspace }}/webapp.zip" >> $GITHUB_ENV
+
+      - name: Run Packer build
+        run: |
+          packer build \
+          -var 'auth_file=data.json' \
+          -var 'project_path=${{ env.WEBAPP_ZIP_PATH }}' \
+          -var 'MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}' \
+          -var 'MYSQL_SERVER_URL=${{ secrets.MYSQL_SERVER_URL }}' \
+          -var 'MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}' \
+          -var 'MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}' \
+          -var 'MYSQL_PORT=${{ secrets.MYSQL_PORT }}' \
+          -var 'project_id=${{ secrets.PROJECT_ID }}' \
+          -var 'gcp_region=${{ secrets.GCP_REGION }}' \
+          -var 'gcp_zone=${{ secrets.GCP_ZONE }}' \
+          -var 'gcp_profile=${{ secrets.GCP_PROFILE }}' \
+          -var 'source_image=${{ secrets.SOURCE_IMAGE }}' \
+          -var 'ssh_username=${{ secrets.SSH_USERNAME }}' \
+          packer.pkr.hcl
