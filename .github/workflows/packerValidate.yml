@@ -19,14 +19,13 @@ jobs:
           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
           sudo apt-get update && sudo apt-get install packer
 
-      - name: Format Packer template
+      - name: Check Packer format
         run: |
-          packer fmt ./packer/packer.json
-          # Check if there are changes after formatting
-          if [[ -n "$(git diff --exit-code)" ]]; then
-            echo "::error::Packer template has been modified by packer fmt. Please fix and commit the changes."
+          packer fmt -check packer.pkr.hcl
+          exit_code=$?
+          if [ $exit_code -eq 1 ]; then
+            echo "Packer format check failed. Exiting..."
             exit 1
           fi
-
       - name: Validate Packer template
-        run: packer validate ./packer/packer.json
+        run: packer validate packer.pkr.hcl
