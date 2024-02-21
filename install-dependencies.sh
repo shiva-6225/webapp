@@ -2,7 +2,7 @@
 set -e
 
 # Update package repos
-# sudo yum update -y
+sudo yum update -y
 
 # Install MySQL server
 sudo yum install -y mysql-server

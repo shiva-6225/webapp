@@ -71,6 +71,7 @@ variable "auth_file" {
 
 source "googlecompute" "centos-image" {
   project_id         = "${var.project_id}"
+  image_name         = "webapp-image"
   source_image       = "${var.source_image}"
   ssh_username       = "${var.ssh_username}"
   zone               = "${var.gcp_zone}"
