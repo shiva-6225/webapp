@@ -20,7 +20,7 @@ jobs:
       
       - name: Decode JSON secret
         run: |
-          echo "${{ secrets.JSON_SECRET }}" | base64 --decode > data.json
+          echo "${{ secrets.SERVICE_AUTH }}" | base64 --decode > data.json
           cat data.json
         
 
