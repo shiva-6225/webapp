@@ -94,6 +94,67 @@ npm test
 4. Execute Terraform to provision the infrastructure.
 5. Run integration tests to verify functionality.
 
+# Packer Template: WebApp Image Provisioning
+
+This Packer template automates the creation of a custom image for a web application deployment on Google Cloud Platform (GCP). The image is preconfigured with necessary dependencies, services, and application setup to streamline the deployment process.
+
+## Prerequisites
+
+Before using this Packer template, ensure you have the following prerequisites installed and configured:
+
+- Packer
+- Google Cloud SDK (gcloud)
+- Access to a GCP project with necessary permissions
+- SSH Key Pair for authentication
+
+## Variables
+
+The Packer template uses the following variables:
+
+- `project_id`: GCP project ID where the image will be created.
+- `gcp_region`: GCP region where the instance will be launched.
+- `gcp_zone`: GCP zone where the instance will be launched.
+- `gcp_profile`: GCP profile to use for authentication.
+- `source_image`: Source image for the base instance.
+- `ssh_username`: SSH username for connecting to the instance.
+- `MYSQL_USERNAME`: MySQL username for database setup.
+- `MYSQL_SERVER_URL`: MySQL server URL for database setup.
+- `MYSQL_PASSWORD`: MySQL password for database setup.
+- `MYSQL_DATABASE`: MySQL database name.
+- `MYSQL_PORT`: MySQL port number.
+- `project_path`: Path to the project files to be copied to the instance.
+- `auth_file`: Path to the authentication file for GCP.
+
+## Provisioners
+
+The Packer template utilizes the following provisioners:
+
+1. **Shell Provisioner (install-dependencies.sh):**
+   - Installs dependencies required for the web application.
+
+2. **Shell Provisioner (configure_services.sh):**
+   - Configures services and sets environment variables for MySQL database.
+
+3. **File Provisioner:**
+   - Copies project files to the instance.
+
+4. **File Provisioner:**
+   - Copies systemd service configuration file to the instance.
+
+5. **Shell Provisioner (setupApp.sh):**
+   - Sets up the web application using environment variables.
+
+6. **Shell Provisioner (startService.sh):**
+   - Starts the web application service on the instance.
+
+## Usage
+
+1. Configure the required variables in the Packer template.
+2. Run Packer build to create the custom image:
+
+   ```bash
+   packer build <packer_template_file>
+
 
 ## Resources Referred
 - For Sequelize model designs, hooks, CRUD operations: [Sequelize Documentation](https://sequelize.org/docs/v6/getting-started/)
