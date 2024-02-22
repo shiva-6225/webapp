@@ -48,7 +48,10 @@
             MYSQL_SERVER_URL: ${{ secrets.MYSQL_SERVER_URL }}
             MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
             MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        
+            
+        - name: Stop MySQL Server Connection
+          run: |
+            mysqladmin -u ${{ secrets.MYSQL_USERNAME }} -p"${{ secrets.MYSQL_PASSWORD }}" shutdown
         - name: Test Connection
           run: |
             npm test
@@ -58,6 +61,4 @@
               echo "Database Connection Failed"
               exit 1
             fi
-        - name: Stop MySQL Server Connection
-          run: |
-            mysqladmin -u ${{ secrets.MYSQL_USERNAME }} -p"${{ secrets.MYSQL_PASSWORD }}" shutdown
+       
