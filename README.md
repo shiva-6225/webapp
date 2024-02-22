@@ -1,4 +1,4 @@
-# Webapp
+# Webapp (for the demo)
 
 ## Description
 This project aims to create APIs for user management and health checks. It includes endpoints for user creation, retrieval, and updating, as well as a health check endpoint for verifying the database connection.
