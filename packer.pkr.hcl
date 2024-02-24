@@ -8,8 +8,8 @@ packer {
 }
 
 variable "project_id" {
-  type    = string
-  default = ""
+  type    = number
+  default = 
 }
 
 variable "gcp_region" {
