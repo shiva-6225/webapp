@@ -7,11 +7,6 @@ packer {
   }
 }
 
-variable "project_id" {
-  type    = string
-  default = ""
-}
-
 variable "gcp_region" {
   type    = string
   default = ""
