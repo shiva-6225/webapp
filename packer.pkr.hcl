@@ -13,7 +13,7 @@ variable "project_id" {
 }
 
 variable "gcp_region" {
-  type    = string
+  type        = string
   default = ""
 }
 
