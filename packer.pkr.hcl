@@ -37,26 +37,6 @@ variable "ssh_username" {
   default = ""
 }
 
-variable "MYSQL_USERNAME" {
-  type    = string
-  default = "default"
-}
-variable "MYSQL_SERVER_URL" {
-  type    = string
-  default = "default"
-}
-variable "MYSQL_PASSWORD" {
-  type    = string
-  default = "default"
-}
-variable "MYSQL_DATABASE" {
-  type    = string
-  default = "default"
-}
-variable "MYSQL_PORT" {
-  type    = string
-  default = "default"
-}
 variable "project_path" {
   type    = string
   default = ""
