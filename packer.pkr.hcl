@@ -75,6 +75,11 @@ build {
     destination = "/tmp/csye6225.service"
   }
 
+  provisioner "file" {
+    source      = "csye6225.path"
+    destination = "/tmp/csye6225.path"
+  }
+
   provisioner "shell" {
     script = "./setupApp.sh"
   }

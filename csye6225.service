@@ -2,7 +2,6 @@
 Description=CSYE 6225 App
 After=network.target
 Wants=cloud-init.target
-ConditionPathExists=/opt/db-startup.sh
 
 [Service]
 User=csye6225
