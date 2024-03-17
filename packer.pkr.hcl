@@ -81,6 +81,19 @@ build {
   }
 
   provisioner "shell" {
+    script      = "./installOpsAgent.sh"
+  }
+  
+  provisioner "file" {
+      source = "./ops-agent-config.yaml",
+      destination = "/etc/google-cloud-ops-agent/config.yaml"
+  }
+
+  provisioner "shell" {
+    script      = "./restartOpsAgent.sh"
+  }
+
+  provisioner "shell" {
     script = "./setupApp.sh"
   }
   provisioner "shell" {

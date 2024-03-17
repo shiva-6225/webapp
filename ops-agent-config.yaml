@@ -1,0 +1,10 @@
+logging:
+  receivers:
+    application_log:
+      type: files
+      include_paths:
+      - "/var/log/webapp/*.log"
+  service:
+    pipelines:
+      default_pipeline:
+        receivers: [application_log]
