@@ -86,7 +86,7 @@ build {
 
   provisioner "file" {
     source      = "ops-agent-config.yaml"
-    destination = "/etc/google-cloud-ops-agent/config.yaml"
+    destination = "/tmp/config.yaml"
   }
 
   provisioner "shell" {
