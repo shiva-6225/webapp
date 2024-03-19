@@ -46,7 +46,7 @@ variable "auth_file" {
   default = ""
 }
 variable "monitor_auth" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -86,7 +86,7 @@ build {
   }
 
   provisioner "file" {
-    source = "${var.monitor_auth}"
+    source      = "${var.monitor_auth}"
     destination = "/tmp/monitor-account-key.json"
   }
 
