@@ -45,6 +45,10 @@ variable "auth_file" {
   type    = string
   default = ""
 }
+variable "monitor_auth" {
+  type = string
+  default = ""
+}
 
 
 
@@ -57,6 +61,7 @@ source "googlecompute" "centos-image" {
   zone               = "${var.gcp_zone}"
   network_project_id = "default"
   credentials_file   = "${var.auth_file}"
+
 }
 
 build {
@@ -78,6 +83,11 @@ build {
   provisioner "file" {
     source      = "csye6225.path"
     destination = "/tmp/csye6225.path"
+  }
+
+  provisioner "file" {
+    source = "${var.monitor_auth}"
+    destination = "/tmp/monitor-account-key.json"
   }
 
   provisioner "shell" {
