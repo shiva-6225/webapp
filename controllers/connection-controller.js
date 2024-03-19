@@ -1,7 +1,17 @@
 const sequelize = require("../db-connection.js");
 const { setResponse, setErrorResponse } = require("./response-handler.js");
-const Logger = require('node-json-logger');
-const logger = new Logger();
+const winston = require('winston');
+const { combine, timestamp, json } = winston.format;
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: combine(timestamp(), json()),
+  transports: [
+    new winston.transports.File({
+      filename: '/var/log/webapp/test.log',
+    }),
+  ],
+});
 exports.connectDB = async (req, res) => {
     logger.info("Attempting to connect to the database...");
     try {
