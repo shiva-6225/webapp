@@ -1,8 +1,18 @@
 const { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } = require("./response-handler.js");
 const { register, fetchUser, updateUser } = require("../services/user-service.js");
 const { isEmail } = require('../helpers/email-validation.js');
-const Logger = require('node-json-logger');
-const logger = new Logger();
+const winston = require('winston');
+const { combine, timestamp, json } = winston.format;
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: combine(timestamp(), json()),
+  transports: [
+    new winston.transports.File({
+      filename: '/var/log/webapp/test.log',
+    }),
+  ],
+});
 
 exports.createUser = async (req, res) => {
     logger.info("Creating a new user");

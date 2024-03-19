@@ -1,7 +1,17 @@
 const User = require("../models/user.js");
 const bcrypt = require('bcrypt');
-const Logger = require('node-json-logger');
-const logger = new Logger();
+const winston = require('winston');
+const { combine, timestamp, json } = winston.format;
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: combine(timestamp(), json()),
+  transports: [
+    new winston.transports.File({
+      filename: '/var/log/webapp/test.log',
+    }),
+  ],
+});
 // function to fetch the user chat
 exports.register = async (user) => {
     logger.info("Attempting to register a new user", { username: user.username });
