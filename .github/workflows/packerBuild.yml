@@ -19,7 +19,7 @@ jobs:
 
       - name: Decode Monitor auth JSON secret
         run: |
-          echo "${{ secrets.MONITOR_AUTH }}" | base64 --decode > data.json
+          echo "${{ secrets.MONITOR_AUTH }}" | base64 --decode > monitor_auth.json
           cat monitor_auth.json
         
 
