@@ -9,7 +9,3 @@ cd /
 sudo mkdir -p /var/log/webapp/
 sudo touch /var/log/webapp/test.log
 sudo chmod -R go+r /var/log/webapp/
-
-sudo mkdir -p /var/log/webapp/
-sudo touch /var/log/webapp/test.log
-sudo chmod -R go+r /var/log/webapp/
