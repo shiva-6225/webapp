@@ -14,12 +14,15 @@ const logger = winston.createLogger({
 });
 exports.connectDB = async (req, res) => {
     logger.info("Attempting to connect to the database...");
+    logger.debug("connectDB: Preparing to authenticate database connection.");
     try {
         await sequelize.authenticate();
+        logger.debug("connectDB: Database authentication successful.");
         logger.info("Database connection was successful.");
         setResponse(req, res);
     }
     catch (err) {
+        logger.debug(`connectDB: Database connection failed with error - ${err.message}`);
         logger.error("Database connection failed", { error: err.message });
         setErrorResponse(err, res);
     }
