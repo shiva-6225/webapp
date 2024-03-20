@@ -12,10 +12,10 @@ logging:
       time_key: time
       time_format: "%Y-%m-%dT%H:%M:%S.%L%Z"
     move_severity:
-      type: modify_fields
+      type:   
       fields:
         severity:
-          move_from: jsonPayload.severity
+          move_from: jsonPayload.level
 
   service:
     pipelines:
