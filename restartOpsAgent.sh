@@ -18,6 +18,6 @@ sudo chmod 600 /etc/google-cloud-ops-agent/config.yaml
 # sudo systemctl daemon-reload
 
 echo 'Restarting Ops Agent to apply new configuration...'
-sudo systemctl status google-cloud-ops-agent*.service
-sudo systemctl restart google-cloud-ops-agent.service
+sudo systemctl status google-cloud-ops-agent
+sudo systemctl restart google-cloud-ops-agent
 echo 'Ops Agent is now monitoring application logs.'
