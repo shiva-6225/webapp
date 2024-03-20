@@ -15,9 +15,11 @@ const logger = winston.createLogger({
 });
 
 exports.createUser = async (req, res) => {
+    logger.debug("Entering createUser function");
     logger.info("Creating a new user");
     try {
         const user = req.body;
+        logger.debug(`createUser: Received user data - ${JSON.stringify(user)}`);
         if (!user || Object.keys(user).length === 0 || user.username === undefined || user.password === undefined) {
             logger.warn("createUser: Missing user information");
             res.status(400).send();
@@ -27,6 +29,7 @@ exports.createUser = async (req, res) => {
                 res.status(400).send();
             }
             const existingUser = await fetchUser(user.username, user.password);
+            logger.debug(`createUser: Existing user check - ${JSON.stringify(existingUser)}`);
             if (existingUser.success) {
                 logger.warn("createUser: User already exists", { username: user.username });
                 res.status(400).send();
@@ -45,13 +48,16 @@ exports.createUser = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
+    logger.debug("Entering getUser function");
     logger.info("Fetching user");
     try {
         if (req.headers.authorization && req.headers.authorization.startsWith('Basic ')) {
             const base64Credentials = req.headers.authorization.split(' ')[1];
             const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+            logger.debug(`getUser: Decoded credentials - ${credentials}`);
             const [username, password] = credentials.split(':');
             const userDetails = await fetchUser(username, password);
+            logger.debug(`getUser: UserDetails fetched - ${JSON.stringify(userDetails)}`);
             if (userDetails.success) {
                 logger.info("getUser: User fetched successfully", { username });
                 const userInfo = { ...userDetails.user.toJSON() };
@@ -73,9 +79,11 @@ exports.getUser = async (req, res) => {
 };
 
 exports.updateUserInfo = async (req, res) => {
+    logger.debug("Entering updateUserInfo function");
     logger.info("Updating user information");
     try {
         const updateInfo = req.body;
+        logger.debug(`updateUserInfo: Received update info - ${JSON.stringify(updateInfo)}`);
         const updateOnly = ['firstname', 'lastname', 'password'];
         if (!updateInfo || Object.keys(updateInfo).length === 0 || Object.keys(updateInfo).some(key => !updateOnly.includes(key))) {
             logger.warn("updateUserInfo: Invalid update request");
