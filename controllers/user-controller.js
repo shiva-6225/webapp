@@ -12,14 +12,14 @@ const logger = winston.createLogger({
   format: combine(timestamp(), json()),
   transports: [
     new winston.transports.File({
-        filename: 'webapp.log',
+        filename: '/var/log/webapp.log',
     }),
   ],
 });
 
 // Function to publish a message to the Pub/Sub topic
 async function publishVerificationMessage(email, token) {
-    const topicName = 'verify_email';
+    const topicName = 'projects/webapp-dev-414902/topics/verify_email';
     const dataBuffer = Buffer.from(JSON.stringify({ email, token }));
     const message = {
         data: dataBuffer,
@@ -30,6 +30,8 @@ async function publishVerificationMessage(email, token) {
     try {
         await pubsub.topic(topicName).publishMessage(message);
         logger.info(`Message published to topic ${topicName}`);
+        await verificationEmailSent(newUser.username);
+        logger.info(`Verification email sent status updated for ${newUser.username}`);
     } catch (error) {
         logger.error(`Error publishing message to topic ${topicName}`, { error });
     }
@@ -64,8 +66,6 @@ exports.createUser = async (req, res) => {
                 // Publish a message to the Pub/Sub topic
                 try {
                     await publishVerificationMessage(newUser.username, token);
-                    await verificationEmailSent(newUser.username);
-                    logger.info(`Verification email sent status updated for ${newUser.username}`);
                 } catch (error) {
                     logger.error(`Failed to send verification message for ${newUser.username}`, { error });
                 }

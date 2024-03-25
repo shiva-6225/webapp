@@ -13,6 +13,7 @@ RestartSec=15
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=webapp
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/tmp/auth.json"
 
 [Install]
 WantedBy=multi-user.target
