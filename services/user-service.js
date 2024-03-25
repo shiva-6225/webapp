@@ -66,3 +66,16 @@ exports.updateUser = async (username, oldPassword, userDetails) => {
         return { status: 404 };
     }
 };
+
+exports.verificationEmailSent = async (username) => {
+    logger.info("Attempting to update verification link sent field", { username });
+    const user = await User.findOne({ where: { username } });
+    if (user) {
+            await User.update({ isVerficationEmailSent: true} , { where: { username } });
+            logger.info("User field isVerificationEmailSent updated successfully", { username });
+            return { status: 204 };
+    } else {
+        logger.warn("User not found during update", { username });
+        return { status: 404 };
+    }
+};
