@@ -1,6 +1,9 @@
 const { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } = require("./response-handler.js");
-const { register, fetchUser, updateUser } = require("../services/user-service.js");
+const { register, fetchUser, updateUser, verificationEmailSent } = require("../services/user-service.js");
 const { isEmail } = require('../helpers/email-validation.js');
+const jwt = require('jsonwebtoken');
+const {PubSub} = require('@google-cloud/pubsub');
+const pubsub = new PubSub();
 const winston = require('winston');
 const { combine, timestamp, json } = winston.format;
 
@@ -13,6 +16,24 @@ const logger = winston.createLogger({
     }),
   ],
 });
+
+// Function to publish a message to the Pub/Sub topic
+async function publishVerificationMessage(email, token) {
+    const topicName = 'verify_email';
+    const dataBuffer = Buffer.from(JSON.stringify({ email, token }));
+    const message = {
+        data: dataBuffer,
+        // Optionally, you can add attributes here if needed
+        // attributes: { key: 'value' },
+    };
+
+    try {
+        await pubsub.topic(topicName).publishMessage(message);
+        logger.info(`Message published to topic ${topicName}`);
+    } catch (error) {
+        logger.error(`Error publishing message to topic ${topicName}`, { error });
+    }
+}
 
 exports.createUser = async (req, res) => {
     logger.debug("Entering createUser function");
@@ -36,9 +57,24 @@ exports.createUser = async (req, res) => {
             }
             const newUser = await register(user);
             logger.info("createUser: User registered successfully", { username: user.username });
-            const data = { ...newUser.toJSON() };
-            delete data.password;
-            setUserAPIResponseWithData(data, req, res, 201);
+            if (newUser) {
+                // Generate a JWT for email verification
+                const token = jwt.sign({ email: newUser.username }, 'jwt_secret', { expiresIn: '2m' });
+        
+                // Publish a message to the Pub/Sub topic
+                try {
+                    await publishVerificationMessage(newUser.username, token);
+                    await verificationEmailSent(newUser.username);
+                    logger.info(`Verification email sent status updated for ${newUser.username}`);
+                } catch (error) {
+                    logger.error(`Failed to send verification message for ${newUser.username}`, { error });
+                }
+
+                const data = { ...newUser.toJSON() };
+                delete data.password;
+                setUserAPIResponseWithData(data, req, res, 201);
+            }
+
         }
     }
     catch (err) {

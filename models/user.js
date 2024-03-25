@@ -41,6 +41,18 @@ const User = sequelize.define('User', {
         defaultValue: DataTypes.NOW,
         allowNull: true,
         unique: false,
+    },
+    isVerificationEmailSent: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+        unique: false
+    },
+    isVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+        unique: false
     }
 }, {
     timestamps: false, // Disable createdAt and updatedAt
