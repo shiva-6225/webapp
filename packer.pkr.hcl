@@ -45,10 +45,6 @@ variable "auth_file" {
   type    = string
   default = ""
 }
-// variable "monitor_auth" {
-//   type    = string
-//   default = ""
-// }
 
 
 
@@ -74,6 +70,10 @@ build {
     source      = "${var.project_path}"
     destination = "/home/packer/webapp.zip"
   }
+  provisioner "file" {
+    source      = "${var.auth_file}"
+    destination = "/tmp/auth.json"
+  }
 
   provisioner "file" {
     source      = "csye6225.service"
@@ -84,11 +84,6 @@ build {
     source      = "csye6225.path"
     destination = "/tmp/csye6225.path"
   }
-
-  // provisioner "file" {
-  //   source      = "${var.monitor_auth}"
-  //   destination = "/tmp/monitor-account-key.json"
-  // }
 
   provisioner "shell" {
     script = "./installOpsAgent.sh"
