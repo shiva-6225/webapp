@@ -12,7 +12,7 @@ const logger = winston.createLogger({
   format: combine(timestamp(), json()),
   transports: [
     new winston.transports.File({
-        filename: '/var/log/webapp.log',
+        filename: 'webapp.log',
     }),
   ],
 });
@@ -30,8 +30,6 @@ async function publishVerificationMessage(email, token) {
     try {
         await pubsub.topic(topicName).publishMessage(message);
         logger.info(`Message published to topic ${topicName}`);
-        await verificationEmailSent(newUser.username);
-        logger.info(`Verification email sent status updated for ${newUser.username}`);
     } catch (error) {
         logger.error(`Error publishing message to topic ${topicName}`, { error });
     }
@@ -66,6 +64,8 @@ exports.createUser = async (req, res) => {
                 // Publish a message to the Pub/Sub topic
                 try {
                     await publishVerificationMessage(newUser.username, token);
+                    await verificationEmailSent(newUser.username);
+                    logger.info(`Verification email sent status updated for ${newUser.username}`);
                 } catch (error) {
                     logger.error(`Failed to send verification message for ${newUser.username}`, { error });
                 }
