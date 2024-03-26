@@ -56,11 +56,13 @@ const User = sequelize.define('User', {
     },
     verificationToken: {
         type: DataTypes.STRING,
+        defaultValue: null,
         allowNull: true,
         unique: false,
     },
     verificationTokenExpiry: {
         type: DataTypes.DATE,
+        defaultValue: null,
         allowNull: true,
         unique: false,
     }
