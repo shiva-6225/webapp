@@ -79,3 +79,23 @@ exports.verificationEmailSent = async (username) => {
         return { status: 404 };
     }
 };
+
+exports.verifyEmail = async()=>{
+        const user = await User.findOne({ where: { verificationToken: token } });
+
+        if (!user) {
+            return { status: 404 };
+        }
+
+        // Check if the token is expired
+        if (user.verificationTokenExpiry < new Date()) {
+            return { status: 400 };
+        }
+
+        // Update the user as verified and clear the token fields
+        await User.update(
+            { isVerified: true, verificationToken: null, verificationTokenExpiry: null },
+            { where: { id: user.id } }
+        );
+        return {status : 200}; 
+}

@@ -53,6 +53,16 @@ const User = sequelize.define('User', {
         defaultValue: false,
         allowNull: false,
         unique: false
+    },
+    verificationToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false,
+    },
+    verificationTokenExpiry: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        unique: false,
     }
 }, {
     timestamps: false, // Disable createdAt and updatedAt
