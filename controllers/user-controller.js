@@ -1,5 +1,5 @@
 const { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } = require("./response-handler.js");
-const { register, fetchUser, updateUser, verificationEmailSent } = require("../services/user-service.js");
+const { register, fetchUser, updateUser, verificationEmailSent, verifyEmail } = require("../services/user-service.js");
 const { isEmail } = require('../helpers/email-validation.js');
 const jwt = require('jsonwebtoken');
 const {PubSub} = require('@google-cloud/pubsub');
@@ -18,9 +18,9 @@ const logger = winston.createLogger({
 });
 
 // Function to publish a message to the Pub/Sub topic
-async function publishVerificationMessage(email, token) {
+async function publishVerificationMessage(email, token, firstname) {
     const topicName = 'projects/webapp-dev-414902/topics/verify_email';
-    const dataBuffer = Buffer.from(JSON.stringify({ email, token }));
+    const dataBuffer = Buffer.from(JSON.stringify({ email, token, firstname }));
     const message = {
         data: dataBuffer,
         // Optionally, you can add attributes here if needed
@@ -63,7 +63,7 @@ exports.createUser = async (req, res) => {
         
                 // Publish a message to the Pub/Sub topic
                 try {
-                    await publishVerificationMessage(newUser.username, token);
+                    await publishVerificationMessage(newUser.username, token, newUser.firstname);
                     await verificationEmailSent(newUser.username);
                     logger.info(`Verification email sent status updated for ${newUser.username}`);
                 } catch (error) {
@@ -143,3 +143,13 @@ exports.updateUserInfo = async (req, res) => {
         setErrorResponse(err, res);
     }
 };
+
+exports.verifyEmail = async (req, res) => {
+    const { token } = req.query;
+
+    if (!token) {
+        return res.status(400).send();
+    }
+    const result = await verifyEmail();
+    res.status(result.status).send();
+}
