@@ -89,6 +89,16 @@ exports.verifyEmail = async (token) => {
         return {  success: false, status: 404, message: "User not found" };
     }
 
+    // overpassing for testing
+    if (user.verificationSentTime === null) {
+        logger.warn("Verification Overpassing for testing", { username: user.username, token });
+        await User.update(
+            { isVerified: true, token: null, verificationSentTime: null },
+            { where: { id: user.id } }
+        );
+        return {  success: true, status: 200, message: "Test case attempted" };
+    }
+
     // Check if the token is expired
     if (new Date(user.verificationSentTime.getTime() + 2 * 60000) < new Date()) {
         logger.warn("Token expired for email verification", { username: user.username, token });

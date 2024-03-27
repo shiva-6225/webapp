@@ -34,7 +34,6 @@ describe("Integration Tests for User Operations", () => {
                 lastname: "user",
                 username: "test1001@example.com",
                 password: "password123",
-                isVerified: true
             };
 
             const response = await request(app)
@@ -45,7 +44,9 @@ describe("Integration Tests for User Operations", () => {
             expect(response.body).toHaveProperty("id");
             username = response.body.username;
             password = "password123";
+            token = response.body.token;
 
+            await request(app).get(`/verify/${token}`);
             // Check if the created user can be retrieved with Basic auth headers
             const getUserResponse = await request(app)
                 .get(`/v1/user/self`)
