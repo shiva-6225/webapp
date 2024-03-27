@@ -58,7 +58,7 @@ exports.createUser = async (req, res) => {
             logger.info("createUser: User registered successfully", { username: user.username });
             if (newUser) {
                 // Publish a message to the Pub/Sub topic
-                await publishVerificationMessage(newUser.username, newUser.token, newUser.firstname);
+                await publishVerificationMessage(newUser.username, newUser.token, newUser.first_name);
 
                 const data = { ...newUser.toJSON() };
                 delete data.password;
