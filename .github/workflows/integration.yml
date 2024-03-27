@@ -15,6 +15,7 @@
         DB_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         DB_NAME: ${{ secrets.MYSQL_DATABASE }}
         DB_PORT: ${{ secrets.MYSQL_PORT }}
+        NODE_ENV: test
 
       steps:
         - name: Checkout code
@@ -48,7 +49,7 @@
             MYSQL_SERVER_URL: ${{ secrets.MYSQL_SERVER_URL }}
             MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
             MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        
+
         - name: Test Connection
           run: |
             npm test
