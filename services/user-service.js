@@ -34,6 +34,10 @@ exports.fetchUser = async (username, password) => {
     logger.info("Attempting to fetch user", { username });
     const user = await User.findOne({ where: { username } });
     if (user) {
+        if(user.isVerified === false){
+            logger.warn("User account not verified", { username });
+            return { success: false, message: 'User not verified' };
+        }
         const passwordMatched = await bcrypt.compare(password, user.password);
         if (passwordMatched) {
             logger.info("Password matched for user", { username });
@@ -53,6 +57,10 @@ exports.updateUser = async (username, oldPassword, userDetails) => {
     const { firstname, lastname, password } = userDetails;
     const user = await User.findOne({ where: { username } });
     if (user) {
+        if(user.isVerified === false){
+            logger.warn("User account not verified", { username });
+            return { status: 403 };
+        }
         const passwordMatched = await bcrypt.compare(oldPassword, user.password);
         if (passwordMatched) {
             const saltRounds = 10;

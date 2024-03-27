@@ -3,7 +3,7 @@ const userController = require("../controllers/user-controller.js");
 
 const router = express.Router();
 
-router.route('/')
+router.route('/:token')
     .get(userController.verifyEmail);
 
 module.exports = router;

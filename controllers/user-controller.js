@@ -136,8 +136,7 @@ exports.updateUserInfo = async (req, res) => {
 
 exports.verifyEmail = async (req, res) => {
     logger.debug("Entering verifyEmail function");
-    const { token } = req.query;
-
+    const {token}  = req.params;
     if (!token) {
         logger.warn("verifyEmail: Missing token in request");
         return res.status(400).send();
