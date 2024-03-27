@@ -19,7 +19,7 @@ const logger = winston.createLogger({
 // Function to publish a message to the Pub/Sub topic
 async function publishVerificationMessage(email, token, firstname) {
     const topicName = 'projects/webapp-dev-414902/topics/verify_email';
-    const dataBuffer = { email, token, firstname };
+    const dataBuffer = Buffer.from(JSON.stringify({ email, token, firstname }));
     const message = {
         data: dataBuffer,
         // Optionally, you can add attributes here if needed
