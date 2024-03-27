@@ -139,7 +139,7 @@ exports.verifyEmail = async (req, res) => {
     const {token}  = req.params;
     if (!token) {
         logger.warn("verifyEmail: Missing token in request");
-        return res.status(400).send();
+        return res.status(400).send('Missing token in request.');
     }
 
     try {
@@ -147,10 +147,33 @@ exports.verifyEmail = async (req, res) => {
         const result = await verifyEmail(token);
         if (result.success) {
             logger.info("verifyEmail: Email verified successfully", { token });
-            res.status(result.status).send("verification successful");
+
+            // Send back HTML content for successful verification
+            res.status(result.status).send(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Email Verification Success</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+                        .content { max-width: 600px; margin: auto; }
+                        h1 { color: #4CAF50; }
+                    </style>
+                </head>
+                <body>
+                    <div class="content">
+                        <h1>Email Verified Successfully!</h1>
+                        <p>Your email has been successfully verified. You can now use all the features of our service.</p>
+                        <a href="/">Go to Homepage</a>
+                    </div>
+                </body>
+                </html>
+            `);
         } else {
             logger.warn("verifyEmail: Failed to verify email", { token, reason: result.message });
-            res.status(result.status).send({ message: result.message });
+            res.status(result.status).send(`<html><body><p>Error: ${result.message}</p></body></html>`);
         }
     } catch (err) {
         logger.error("verifyEmail: Error verifying email", { token, error: err });
