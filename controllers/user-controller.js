@@ -1,7 +1,6 @@
 const { setErrorResponse, setUserAPIResponse, setUserAPIResponseWithData } = require("./response-handler.js");
-const { register, fetchUser, updateUser, verificationEmailSent, verifyEmail } = require("../services/user-service.js");
+const { register, fetchUser, updateUser, verifyEmail } = require("../services/user-service.js");
 const { isEmail } = require('../helpers/email-validation.js');
-const jwt = require('jsonwebtoken');
 const {PubSub} = require('@google-cloud/pubsub');
 const pubsub = new PubSub();
 const winston = require('winston');
@@ -20,7 +19,7 @@ const logger = winston.createLogger({
 // Function to publish a message to the Pub/Sub topic
 async function publishVerificationMessage(email, token, firstname) {
     const topicName = 'projects/webapp-dev-414902/topics/verify_email';
-    const dataBuffer = Buffer.from(JSON.stringify({ email, token, firstname }));
+    const dataBuffer = { email, token, firstname };
     const message = {
         data: dataBuffer,
         // Optionally, you can add attributes here if needed
@@ -58,17 +57,8 @@ exports.createUser = async (req, res) => {
             const newUser = await register(user);
             logger.info("createUser: User registered successfully", { username: user.username });
             if (newUser) {
-                // Generate a JWT for email verification
-                const token = jwt.sign({ email: newUser.username }, 'jwt_secret', { expiresIn: '2m' });
-        
                 // Publish a message to the Pub/Sub topic
-                try {
-                    await publishVerificationMessage(newUser.username, token, newUser.firstname);
-                    await verificationEmailSent(newUser.username);
-                    logger.info(`Verification email sent status updated for ${newUser.username}`);
-                } catch (error) {
-                    logger.error(`Failed to send verification message for ${newUser.username}`, { error });
-                }
+                await publishVerificationMessage(newUser.username, newUser.token, newUser.firstname);
 
                 const data = { ...newUser.toJSON() };
                 delete data.password;
@@ -150,6 +140,6 @@ exports.verifyEmail = async (req, res) => {
     if (!token) {
         return res.status(400).send();
     }
-    const result = await verifyEmail();
+    const result = await verifyEmail(token);
     res.status(result.status).send();
 }

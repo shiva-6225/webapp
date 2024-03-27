@@ -1,6 +1,7 @@
 const User = require("../models/user.js");
 const bcrypt = require('bcrypt');
 const winston = require('winston');
+const { v4: uuidv4 } = require('uuid');
 const { combine, timestamp, json } = winston.format;
 
 const logger = winston.createLogger({
@@ -15,6 +16,7 @@ const logger = winston.createLogger({
 // function to fetch the user chat
 exports.register = async (user) => {
     logger.info("Attempting to register a new user", { username: user.username });
+    const token = uuidv4();
     const { firstname, lastname, username, password } = user;
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -22,7 +24,8 @@ exports.register = async (user) => {
         first_name: firstname,
         last_name: lastname,
         username,
-        password: hashedPassword
+        password: hashedPassword,
+        token
     });
     return newUser;
 };
@@ -67,35 +70,29 @@ exports.updateUser = async (username, oldPassword, userDetails) => {
     }
 };
 
-exports.verificationEmailSent = async (username) => {
-    logger.info("Attempting to update verification link sent field", { username });
-    const user = await User.findOne({ where: { username } });
-    if (user) {
-            await User.update({ isVerficationEmailSent: true} , { where: { username } });
-            logger.info("User field isVerificationEmailSent updated successfully", { username });
-            return { status: 204 };
-    } else {
-        logger.warn("User not found during update", { username });
-        return { status: 404 };
+
+exports.verifyEmail = async (token) => {
+    logger.info("Attempting to verify email", { token });
+
+    const user = await User.findOne({ where: { token: token } });
+
+    if (!user) {
+        logger.warn("User not found during email verification", { token });
+        return { status: 404, message: "User not found" };
     }
+
+    // Check if the token is expired
+    if (new Date(user.verificationSentTime.getTime() + 2 * 60000) < new Date()) {
+        logger.warn("Token expired for email verification", { username: user.username, token });
+        return { status: 400, message: "Token expired" };
+    }
+
+    // Update the user as verified and clear the token fields
+    await User.update(
+        { isVerified: true, token: null, verificationSentTime: null },
+        { where: { id: user.id } }
+    );
+
+    logger.info("Email verified successfully", { username: user.username });
+    return { status: 200, message: "Email verified successfully" };
 };
-
-exports.verifyEmail = async()=>{
-        const user = await User.findOne({ where: { verificationToken: token } });
-
-        if (!user) {
-            return { status: 404 };
-        }
-
-        // Check if the token is expired
-        if (user.verificationTokenExpiry < new Date()) {
-            return { status: 400 };
-        }
-
-        // Update the user as verified and clear the token fields
-        await User.update(
-            { isVerified: true, verificationToken: null, verificationTokenExpiry: null },
-            { where: { id: user.id } }
-        );
-        return {status : 200}; 
-}

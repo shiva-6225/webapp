@@ -42,30 +42,24 @@ const User = sequelize.define('User', {
         allowNull: true,
         unique: false,
     },
-    isVerificationEmailSent: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false,
-        unique: false
-    },
     isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false,
         unique: false
     },
-    verificationToken: {
-        type: DataTypes.STRING,
-        defaultValue: null,
-        allowNull: true,
-        unique: false,
-    },
-    verificationTokenExpiry: {
+    verificationSentTime: {
         type: DataTypes.DATE,
         defaultValue: null,
         allowNull: true,
         unique: false,
-    }
+    },
+    token: {
+        type: DataTypes.UUID,
+        defaultValue: null,
+        allowNull: true,
+        unique: true,
+    },
 }, {
     timestamps: false, // Disable createdAt and updatedAt
     indexes: [
