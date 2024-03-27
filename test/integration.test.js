@@ -33,7 +33,8 @@ describe("Integration Tests for User Operations", () => {
                 firstname: "alpha",
                 lastname: "user",
                 username: "test1001@example.com",
-                password: "password123"
+                password: "password123",
+                isVerified: true
             };
 
             const response = await request(app)
