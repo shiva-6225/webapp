@@ -135,11 +135,26 @@ exports.updateUserInfo = async (req, res) => {
 };
 
 exports.verifyEmail = async (req, res) => {
+    logger.debug("Entering verifyEmail function");
     const { token } = req.query;
 
     if (!token) {
+        logger.warn("verifyEmail: Missing token in request");
         return res.status(400).send();
     }
-    const result = await verifyEmail(token);
-    res.status(result.status).send();
-}
+
+    try {
+        logger.info("verifyEmail: Attempting to verify email", { token });
+        const result = await verifyEmail(token);
+        if (result.success) {
+            logger.info("verifyEmail: Email verified successfully", { token });
+            res.status(result.status).send("verification successful");
+        } else {
+            logger.warn("verifyEmail: Failed to verify email", { token, reason: result.message });
+            res.status(result.status).send({ message: result.message });
+        }
+    } catch (err) {
+        logger.error("verifyEmail: Error verifying email", { token, error: err });
+        setErrorResponse(err, res);
+    }
+};

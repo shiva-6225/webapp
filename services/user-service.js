@@ -78,13 +78,13 @@ exports.verifyEmail = async (token) => {
 
     if (!user) {
         logger.warn("User not found during email verification", { token });
-        return { status: 404, message: "User not found" };
+        return {  success: false, status: 404, message: "User not found" };
     }
 
     // Check if the token is expired
     if (new Date(user.verificationSentTime.getTime() + 2 * 60000) < new Date()) {
         logger.warn("Token expired for email verification", { username: user.username, token });
-        return { status: 400, message: "Token expired" };
+        return {  success: false, status: 400, message: "Token expired" };
     }
 
     // Update the user as verified and clear the token fields
@@ -94,5 +94,5 @@ exports.verifyEmail = async (token) => {
     );
 
     logger.info("Email verified successfully", { username: user.username });
-    return { status: 200, message: "Email verified successfully" };
+    return { success: true, status: 200, message: "Email verified successfully" };
 };
