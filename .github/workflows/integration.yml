@@ -49,6 +49,11 @@
             MYSQL_SERVER_URL: ${{ secrets.MYSQL_SERVER_URL }}
             MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
             MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        
+        - name: Delete Users Table
+          run: |
+            mysql -u ${{ secrets.MYSQL_USERNAME }} -p"${{ secrets.MYSQL_PASSWORD }}" ${{ secrets.MYSQL_DATABASE }} -e "DROP TABLE IF EXISTS users;"
+
 
         - name: Test Connection
           run: |
