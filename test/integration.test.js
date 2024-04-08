@@ -57,7 +57,7 @@ describe("Integration Tests for User Operations", () => {
         } catch (err) {
             expect(false).toBe(true);
         }
-    });
+    },10000);
 
     it("updates an existing user and checks if it's updated", async () => {
         try {
@@ -85,8 +85,9 @@ describe("Integration Tests for User Operations", () => {
 
     afterAll(async () => {
         // Remove the user model
-        await User.destroy({ where: { username } });
-
+        if (username) {
+            await User.destroy({ where: { username } });
+          }
         await User.sequelize.close();
     });
 });

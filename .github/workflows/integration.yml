@@ -49,6 +49,7 @@
             MYSQL_SERVER_URL: ${{ secrets.MYSQL_SERVER_URL }}
             MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
             MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+            NODE_ENV: test
         
         - name: Delete Users Table
           run: |
@@ -64,6 +65,13 @@
               echo "Database Connection Failed"
               exit 1
             fi
+          env:
+            DB_HOST: ${{ secrets.MYSQL_SERVER_URL }}
+            DB_USER: ${{ secrets.MYSQL_USERNAME }}
+            DB_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+            DB_NAME: ${{ secrets.MYSQL_DATABASE }}
+            DB_PORT: ${{ secrets.MYSQL_PORT }}
+            NODE_ENV: test
         - name: Stop MySQL Server Connection
           run: |
             mysqladmin -u ${{ secrets.MYSQL_USERNAME }} -p"${{ secrets.MYSQL_PASSWORD }}" shutdown
