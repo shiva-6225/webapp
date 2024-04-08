@@ -124,7 +124,8 @@ jobs:
             --boot-disk-size=100 \
             --image=projects/webapp-dev-414902/global/images/webapp-image \
             --tags="load-balanced-backend" \
-            --network-interface="network=vpc1,subnetwork=webapp" \
+            --network="network=vpc1 \
+            --subnet=webapp" \
             --metadata=startup-script="$STARTUP_SCRIPT" \
             --service-account="packer-image@webapp-dev-414902.iam.gserviceaccount.com" \
             --scopes="cloud-platform" \
