@@ -91,11 +91,11 @@ exports.getUser = async (req, res) => {
                 setUserAPIResponseWithData(userInfo, req, res, 200);
             } else {
                 logger.warn("getUser: Unauthorized access attempt", { username });
-                res.status(401).send();
+                res.status(userDetails.status).send();
             }
         } else {
             logger.warn("getUser: Missing authorization header");
-            res.status(401).send();
+            res.status(userDetails.status).send();
         }
     }
     catch (err) {

@@ -36,19 +36,19 @@ exports.fetchUser = async (username, password) => {
     if (user) {
         if(user.isVerified === false){
             logger.warn("User account not verified", { username });
-            return { success: false, message: 'User not verified' };
+            return { status: 403, success: false, message: 'User not verified' };
         }
         const passwordMatched = await bcrypt.compare(password, user.password);
         if (passwordMatched) {
             logger.info("Password matched for user", { username });
-            return { success: true, user };
+            return { status: 200, success: true, user };
         } else {
             logger.warn("Incorrect password for user", { username });
-            return { success: false, message: 'Incorrect password' };
+            return { status: 401, success: false, message: 'Incorrect password' };
         }
     } else {
         logger.warn("User not found during fetch", { username });
-        return { success: false, message: 'User not found' };
+        return { status: 404, success: false, message: 'User not found' };
     }
 };
 
@@ -94,13 +94,12 @@ exports.verifyEmail = async (token) => {
         logger.warn("Token expired for email verification", { username: user.username, token });
         return {  success: false, status: 400, message: "Token expired" };
     }
-
-    // Update the user as verified and clear the token fields
-    await User.update(
-        { isVerified: true, token: null, verificationSentTime: null },
-        { where: { id: user.id } }
-    );
-
-    logger.info("Email verified successfully", { username: user.username });
-    return { success: true, status: 200, message: "Email verified successfully" };
+        // Update the user as verified and clear the token fields
+        await User.update(
+            { isVerified: true, token: null, verificationSentTime: null },
+            { where: { id: user.id } }
+        );
+        logger.info("Email verified successfully", { username: user.username });
+        return { success: true, status: 200, message: "Email verified successfully" };
+    
 };

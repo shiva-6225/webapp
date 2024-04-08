@@ -53,3 +53,104 @@ jobs:
           -var 'source_image=${{ secrets.SOURCE_IMAGE }}' \
           -var 'ssh_username=${{ secrets.SSH_USERNAME }}' \
           packer.pkr.hcl
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: '/projects/1040902669763/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'packer-image@webapp-dev-414902.iam.gserviceaccount.com'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Terraform Apply
+        run: |
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Fetch secrets from Secret Manager
+        id: fetch-secrets
+        uses: google-github-actions/get-secretmanager-secrets@v2
+        with:
+          secrets: | 
+            DB_NAME: projects/webapp-dev-414902/secrets/sql-database/versions/latest
+            DB_USER: projects/webapp-dev-414902/secrets/sql-user/versions/latest
+            DB_PASSWORD: projects/webapp-dev-414902/secrets/sql-password/versions/latest
+            DB_HOST: projects/webapp-dev-414902/secrets/sql-instance-ip/versions/latest
+            DB_PORT: projects/webapp-dev-414902/secrets/sql-port/versions/latest
+
+      - name: Create Startup Script
+        run: |
+          cat << 'EOF' > startup-script.sh
+          #!/bin/bash
+          # Navigate to the root directory
+          cd /
+          # Ensure the target directory exists
+          mkdir -p /home/packer/webapp
+          touch /opt/db-startup.sh
+          # Set environment variables file path
+          ENV_FILE="/home/packer/webapp/.env"
+          # Create or overwrite the .env file with database credentials
+          tee "\$ENV_FILE" > /dev/null <<EOT
+          DB_NAME=${{ steps.fetch-secrets.outputs.DB_NAME }}
+          DB_USER=${{ steps.fetch-secrets.outputs.DB_USER }}
+          DB_PASSWORD="${{ steps.fetch-secrets.outputs.DB_PASSWORD }}"
+          DB_HOST="${{ steps.fetch-secrets.outputs.DB_HOST }}"
+          DB_PORT=${{ steps.fetch-secrets.outputs.DB_PORT }}
+          NODE_ENV=prod
+          EOT
+          # Change ownership of the .env file
+          chown csye6225:csye6225 "\$ENV_FILE"
+          EOF
+          chmod +x startup-script.sh
+
+      - name: Update Instance Template
+        run: |
+          gcloud compute instance-templates create "webapp-instance-vpc1" \
+            --machine-type="e2-small" \
+            --region="us-east1" \
+            --tags="load-balanced-backend" \
+            --disk="boot=yes,auto-delete=yes,disk-type=pd-balanced,size=100,image=projects/webapp-dev-414902/global/images/webapp-image,kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-01/cryptoKeys/VM-CMEK" \
+            --network-interface="network=vpc1,subnetwork=webapp" \
+            --metadata=startup-script-url=gs://BUCKET_NAME/startup_script.sh \
+            --service-account="packer-image@webapp-dev-414902.iam.gserviceaccount.com" \
+            --scopes="cloud-platform"
+      - name: Update Managed Instance Group
+        run: |
+          gcloud compute instance-groups managed set-instance-template webapp-instance-group \
+            --template=webapp-instance-vpc1 \
+            --region=us-east1
+
+      - name: Recreate Instances
+        run: |
+          gcloud compute instance-groups managed rolling-action start-update webapp-instance-group \
+            --version template=webapp-instance-vpc1 \
+            --type=proactive \
+            --region=us-east1 \
+            --min-ready=0s \
+            --max-surge=1 \
+            --max-unavailable=0
+        id: recreate_instances
+
+      - name: Wait for Recreate Instances to Complete
+        run: |
+          echo "Waiting for the MIG update to complete..."
+          while true; do
+            STATUS=$(gcloud compute instance-groups managed describe webapp-instance-group --region=us-east1 --format="value(status)")
+              if [[ "$STATUS" == *"versionTarget.isReached=true"* && "$STATUS" == *"isStable=true"* ]]; then
+                echo "Update completed successfully."
+                break
+              else
+                echo "Update in progress..."
+              fi
+            sleep 30
+          done
