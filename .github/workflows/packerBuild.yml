@@ -94,42 +94,41 @@ jobs:
             DB_HOST: projects/webapp-dev-414902/secrets/sql-instance-ip/versions/latest
             DB_PORT: projects/webapp-dev-414902/secrets/sql-port/versions/latest
 
-      - name: Create Startup Script
+      - name: Update Instance Template with Startup Script
         run: |
-          cat << 'EOF' > startup-script.sh
+          # Prepare the startup script content
+          STARTUP_SCRIPT=$(cat <<'EOF'
           #!/bin/bash
           # Navigate to the root directory
           cd /
           # Ensure the target directory exists
           mkdir -p /home/packer/webapp
-          touch /opt/db-startup.sh
           # Set environment variables file path
           ENV_FILE="/home/packer/webapp/.env"
           # Create or overwrite the .env file with database credentials
-          tee "\$ENV_FILE" > /dev/null <<EOT
-          DB_NAME=${{ steps.fetch-secrets.outputs.DB_NAME }}
-          DB_USER=${{ steps.fetch-secrets.outputs.DB_USER }}
-          DB_PASSWORD="${{ steps.fetch-secrets.outputs.DB_PASSWORD }}"
-          DB_HOST="${{ steps.fetch-secrets.outputs.DB_HOST }}"
-          DB_PORT=${{ steps.fetch-secrets.outputs.DB_PORT }}
-          NODE_ENV=prod
-          EOT
+          echo "DB_NAME=${{ steps.fetch-secrets.outputs.DB_NAME }}" > "\$ENV_FILE"
+          echo "DB_USER=${{ steps.fetch-secrets.outputs.DB_USER }}" >> "\$ENV_FILE"
+          echo "DB_PASSWORD=${{ steps.fetch-secrets.outputs.DB_PASSWORD }}" >> "\$ENV_FILE"
+          echo "DB_HOST=${{ steps.fetch-secrets.outputs.DB_HOST }}" >> "\$ENV_FILE"
+          echo "DB_PORT=${{ steps.fetch-secrets.outputs.DB_PORT }}" >> "\$ENV_FILE"
+          echo "NODE_ENV=prod" >> "\$ENV_FILE"
           # Change ownership of the .env file
           chown csye6225:csye6225 "\$ENV_FILE"
           EOF
-          chmod +x startup-script.sh
+          )
 
-      - name: Update Instance Template
-        run: |
+          # Use the startup script directly in the instance template
           gcloud compute instance-templates create "webapp-instance-vpc1" \
             --machine-type="e2-small" \
-            --region="us-east1" \
+            --boot-disk-type="pd-balanced" \
+            --boot-disk-size=100 \
+            --image=projects/webapp-dev-414902/global/images/webapp-image \
             --tags="load-balanced-backend" \
-            --disk="boot=yes,auto-delete=yes,disk-type=pd-balanced,size=100,image=projects/webapp-dev-414902/global/images/webapp-image,kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-01/cryptoKeys/VM-CMEK" \
             --network-interface="network=vpc1,subnetwork=webapp" \
-            --metadata=startup-script-url=gs://BUCKET_NAME/startup_script.sh \
+            --metadata=startup-script="$STARTUP_SCRIPT" \
             --service-account="packer-image@webapp-dev-414902.iam.gserviceaccount.com" \
-            --scopes="cloud-platform"
+            --scopes="cloud-platform" \
+            --boot-disk-kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-01/cryptoKeys/VM-CMEK
       - name: Update Managed Instance Group
         run: |
           gcloud compute instance-groups managed set-instance-template webapp-instance-group \
