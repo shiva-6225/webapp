@@ -105,7 +105,8 @@ jobs:
             gcloud compute instance-templates create webapp-instance-vpc1-${{ env.TIMESTAMP }} \
             --project=webapp-dev-414902 \
             --machine-type=e2-small \
-            --network-interface=network-tier=PREMIUM,subnet=webapp-vpc1 \
+            --subnet=webapp-vpc1 \
+            --network=vpc1 \
             --instance-template-region=us-east1 \
             --metadata=wait_for_guest_attributes=true,startup-script='#!/bin/bash
               # Navigate to the root directory
@@ -129,12 +130,12 @@ jobs:
             --scopes=https://www.googleapis.com/auth/cloud-platform \
             --region=us-east1 \
             --tags=load-balanced-backend \
-            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=20,type=pd-balanced \
+            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced \
             --no-shielded-secure-boot \
             --shielded-vtpm \
             --shielded-integrity-monitoring \
-            --reservation-affinity=any
-            --boot-disk-kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-03/cryptoKeys/VM-CMEK
+            --reservation-affinity=any \
+            --boot-disk-kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-03/cryptoKeys/VM-CMEK \
 
       - name: Start Rolling Update
         run: |
