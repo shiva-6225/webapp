@@ -124,12 +124,13 @@ jobs:
             --boot-disk-size=100 \
             --image=projects/webapp-dev-414902/global/images/webapp-image \
             --tags="load-balanced-backend" \
-            --network="network=vpc1 \
-            --subnet=webapp" \
+            --network="projects/webapp-dev-414902/global/networks/vpc1" \
+            --subnet="projects/webapp-dev-414902/regions/us-east1/subnetworks/webapp-vpc1" \
             --metadata=startup-script="$STARTUP_SCRIPT" \
             --service-account="packer-image@webapp-dev-414902.iam.gserviceaccount.com" \
             --scopes="cloud-platform" \
             --boot-disk-kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-01/cryptoKeys/VM-CMEK
+            --tags="load-balanced-backend"
       - name: Update Managed Instance Group
         run: |
           gcloud compute instance-groups managed set-instance-template webapp-instance-group \
