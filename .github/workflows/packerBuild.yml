@@ -99,6 +99,15 @@ jobs:
             DB_PASSWORD: projects/webapp-dev-414902/secrets/sql-password/versions/latest
             DB_HOST: projects/webapp-dev-414902/secrets/sql-instance-ip/versions/latest
             DB_PORT: projects/webapp-dev-414902/secrets/sql-port/versions/latest
+      
+      - name: Binding cryptokeys
+        run: |
+          gcloud kms keys add-iam-policy-binding VM-CMEK \
+          --location us-east1 \
+          --keyring keyring-03 \
+          --member serviceAccount:packer-image@webapp-dev-414902.iam.gserviceaccount.com \
+          --role roles/cloudkms.cryptoKeyEncrypterDecrypter \
+          --project webapp-dev-414902
 
       - name: Create GCP VM Template
         run: |
@@ -135,6 +144,7 @@ jobs:
             --shielded-vtpm \
             --shielded-integrity-monitoring \
             --reservation-affinity=any \
+      
       
       - name: updating MIG with health check
         run: |
