@@ -134,8 +134,7 @@ jobs:
             --shielded-vtpm \
             --shielded-integrity-monitoring \
             --reservation-affinity=any
-            --boot-disk-kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-01/cryptoKeys/VM-CMEK
-            
+            # --boot-disk-kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-01/cryptoKeys/VM-CMEK
 
       - name: Start Rolling Update
         run: |
