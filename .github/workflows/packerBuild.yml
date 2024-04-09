@@ -135,19 +135,19 @@ jobs:
             --shielded-vtpm \
             --shielded-integrity-monitoring \
             --reservation-affinity=any \
-
-      - name: Start Rolling Update
-        run: |
-          gcloud compute instance-groups managed rolling-action start-update webapp-instance-group \
-          --region=us-east1 \
-          --version=template=projects/webapp-dev-414902/regions/us-east1/instanceTemplates/webapp-instance-vpc1-${{ env.TIMESTAMP }}
- 
+      
       - name: updating MIG with health check
         run: |
           gcloud compute instance-groups managed update webapp-instance-group \
           --health-check=projects/webapp-dev-414902/regions/us-east1/healthChecks/webapp-health-check \
           --initial-delay=300 \
           --region=us-east1 \
+
+      - name: Start Rolling Update
+        run: |
+          gcloud compute instance-groups managed rolling-action start-update webapp-instance-group \
+          --region=us-east1 \
+          --version=template=projects/webapp-dev-414902/regions/us-east1/instanceTemplates/webapp-instance-vpc1-${{ env.TIMESTAMP }}
 
       - name: Wait for Recreate Instances to Complete
         run: |
