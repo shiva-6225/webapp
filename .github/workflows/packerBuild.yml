@@ -123,7 +123,8 @@ jobs:
             --boot-disk-type="pd-balanced" \
             --boot-disk-size=100 \
             --image=projects/webapp-dev-414902/global/images/webapp-image \
-            --tags="load-balanced-backend" \
+            --tags=load-balanced-backend \
+            --region=us-east1
             --network="projects/webapp-dev-414902/global/networks/vpc1" \
             --subnet="projects/webapp-dev-414902/regions/us-east1/subnetworks/webapp-vpc1" \
             --metadata=startup-script="$STARTUP_SCRIPT" \
