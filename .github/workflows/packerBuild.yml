@@ -123,44 +123,29 @@ jobs:
           EOF
           )
 
-          # Use the startup script directly in the instance template
-          # gcloud compute instance-templates create "webapp-instance-vpc1" \
-          #   --machine-type="e2-small" \
-          #   --boot-disk-type="pd-balanced" \
-          #   --boot-disk-size=100 \
-          #   --image=projects/webapp-dev-414902/global/images/webapp-image \
-          #   --tags=load-balanced-backend \
-          #   --region=us-east1
-          #   --
-          #   --network="projects/webapp-dev-414902/global/networks/vpc1" \
-          #   --subnet="projects/webapp-dev-414902/regions/us-east1/subnetworks/webapp-vpc1" \
-          #   --metadata=startup-script="$STARTUP_SCRIPT" \
-          #   --service-account="packer-image@webapp-dev-414902.iam.gserviceaccount.com" \
-          #   --scopes="cloud-platform" \
-          #   --boot-disk-kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-01/cryptoKeys/VM-CMEK
-          #   --tags="load-balanced-backend"
-
-          gcloud beta compute instance-templates create webapp-instance-vpc1-${{ env.TIMESTAMP }} \
-          --project=webapp-dev-414902 \
-          --machine-type=e2-small \
-          --network-interface=network-tier=PREMIUM,subnet=webapp-vpc1 \
-          --instance-template-region=us-east1 \
-          --metadata=wait_for_guest_attributes=true,startup-script="$STARTUP_SCRIPT" \
-          --maintenance-policy=MIGRATE \
-          --provisioning-model=STANDARD \
-          --service-account=monitoring-account@webapp-dev-414902.iam.gserviceaccount.com \
-          --scopes=https://www.googleapis.com/auth/cloud-platform \
-          --region=us-east1 \
-          --tags=load-balanced-backend \
-          --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=20,type=pd-balanced \
-          --no-shielded-secure-boot \
-          --shielded-vtpm \
-          --shielded-integrity-monitoring \
-          --reservation-affinity=any
+      - name: Create GCP VM Template
+        run: |
+            gcloud compute instance-templates create webapp-instance-vpc1-${{ env.TIMESTAMP }} \
+            --project=webapp-dev-414902 \
+            --machine-type=e2-small \
+            --network-interface=network-tier=PREMIUM,subnet=webapp-vpc1 \
+            --instance-template-region=us-east1 \
+            --metadata=wait_for_guest_attributes=true,startup-script="$STARTUP_SCRIPT" \
+            --maintenance-policy=MIGRATE \
+            --provisioning-model=STANDARD \
+            --service-account=monitoring-account@webapp-dev-414902.iam.gserviceaccount.com \
+            --scopes=https://www.googleapis.com/auth/cloud-platform \
+            --region=us-east1 \
+            --tags=load-balanced-backend \
+            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=20,type=pd-balanced \
+            --no-shielded-secure-boot \
+            --shielded-vtpm \
+            --shielded-integrity-monitoring \
+            --reservation-affinity=any
 
       - name: Start Rolling Update
         run: |
-          gcloud beta compute instance-groups managed rolling-action start-update webapp-instance-group \
+          gcloud compute instance-groups managed rolling-action start-update webapp-instance-group \
           --region=us-east1 \
           --version=template=projects/webapp-dev-414902/regions/us-east1/instanceTemplates/webapp-instance-vpc1-${{ env.TIMESTAMP }}
  
