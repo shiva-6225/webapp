@@ -100,6 +100,15 @@ jobs:
             DB_HOST: projects/webapp-dev-414902/secrets/sql-instance-ip/versions/latest
             DB_PORT: projects/webapp-dev-414902/secrets/sql-port/versions/latest
       
+      - name: Binding cryptokeys
+        run: |
+          gcloud kms keys add-iam-policy-binding VM-CMEK \
+          --location us-east1 \
+          --keyring keyring-03 \
+          --member serviceAccount:monitoring-account@webapp-dev-414902.iam.gserviceaccount.com \
+          --role roles/cloudkms.cryptoKeyEncrypterDecrypter \
+          --project webapp-dev-414902
+
       - name: Create GCP VM Template
         run: |
             gcloud compute instance-templates create webapp-instance-vpc1-${{ env.TIMESTAMP }} \
