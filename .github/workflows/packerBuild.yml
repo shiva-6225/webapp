@@ -99,8 +99,6 @@ jobs:
             DB_PASSWORD: projects/webapp-dev-414902/secrets/sql-password/versions/latest
             DB_HOST: projects/webapp-dev-414902/secrets/sql-instance-ip/versions/latest
             DB_PORT: projects/webapp-dev-414902/secrets/sql-port/versions/latest
-
-            - name: Create GCP VM Template with Startup Script
       
       - name: create VM Instance Template      
         run: |
