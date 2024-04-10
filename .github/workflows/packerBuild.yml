@@ -119,26 +119,32 @@ jobs:
             --instance-template-region=us-east1 \
             --metadata=wait_for_guest_attributes=true,startup-script='#!/bin/bash
               # Navigate to the root directory
-              cd /
-              # Ensure the target directory exists
-              mkdir -p /home/packer/webapp
+              cd /opt
+
+              sudo touch /opt/db-startup.sh
+
               # Set environment variables file path
               ENV_FILE="/home/packer/webapp/.env"
+
               # Create or overwrite the .env file with database credentials
-              echo "DB_NAME=${{ steps.fetch-secrets.outputs.DB_NAME }}" > $ENV_FILE
-              echo "DB_USER=${{ steps.fetch-secrets.outputs.DB_USER }}" >> $ENV_FILE
-              echo "DB_PASSWORD=${{ steps.fetch-secrets.outputs.DB_PASSWORD }}" >> $ENV_FILE
-              echo "DB_HOST=${{ steps.fetch-secrets.outputs.DB_HOST }}" >> $ENV_FILE
-              echo "DB_PORT=${{ steps.fetch-secrets.outputs.DB_PORT }}" >> $ENV_FILE
-              echo "NODE_ENV=prod" >> $ENV_FILE
+              tee "$ENV_FILE" > /dev/null <<EOF
+              DB_NAME=${{ steps.fetch-secrets.outputs.DB_NAME }}
+              DB_USER=${{ steps.fetch-secrets.outputs.DB_USER }}
+              DB_PASSWORD="${{ steps.fetch-secrets.outputs.DB_PASSWORD }}"
+              DB_HOST="${{ steps.fetch-secrets.outputs.DB_HOST }}"
+              DB_PORT=${{ steps.fetch-secrets.outputs.DB_PORT }}
+              NODE_ENV=prod
+              EOF
+
               # Change ownership of the .env file
-              chown csye6225:csye6225 $ENV_FILE' \
+              chown csye6225:csye6225 "$ENV_FILE"
+              ' \
             --maintenance-policy=MIGRATE \
             --provisioning-model=STANDARD \
             --service-account=monitoring-account@webapp-dev-414902.iam.gserviceaccount.com \
             --scopes=https://www.googleapis.com/auth/cloud-platform \
             --region=us-east1 \
-            --tags=load-balanced-backend \
+            --tags=load-balancer,allow-internet \
             --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced \
             --no-shielded-secure-boot \
             --shielded-vtpm \
