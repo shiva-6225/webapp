@@ -139,12 +139,17 @@ jobs:
             --scopes=https://www.googleapis.com/auth/cloud-platform \
             --region=us-east1 \
             --tags=load-balanced-backend \
-            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced,kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-03/cryptoKeys/VM-CMEK \
+            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced \
             --no-shielded-secure-boot \
             --shielded-vtpm \
             --shielded-integrity-monitoring \
             --reservation-affinity=any \
       
+      - name: Setting Named Port on MIG
+        run: |
+          gcloud compute instance-groups managed set-named-ports webapp-instance-group \
+          --named-ports=http:3000 \
+          --region=us-east1
       
       - name: updating MIG with health check
         run: |
