@@ -1,63 +1,63 @@
 name: Packer Build Workflow
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 jobs:
-  # Artifact_Config_Setup:
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
+  Artifact_Config_Setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
       
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       
-  #     - name: Decode JSON secret
-  #       run: |
-  #         echo "${{ secrets.SERVICE_AUTH }}" | base64 --decode > data.json
-  #         cat data.json
+      - name: Decode JSON secret
+        run: |
+          echo "${{ secrets.SERVICE_AUTH }}" | base64 --decode > data.json
+          cat data.json
 
-  #     # - name: Decode Monitor auth JSON secret
-  #     #   run: |
-  #     #     echo "${{ secrets.MONITOR_AUTH }}" | base64 --decode > monitor_auth.json
-  #     #     cat monitor_auth.json
+      # - name: Decode Monitor auth JSON secret
+      #   run: |
+      #     echo "${{ secrets.MONITOR_AUTH }}" | base64 --decode > monitor_auth.json
+      #     cat monitor_auth.json
         
 
-  #     - name: Zip project
-  #       run: |
-  #         zip -r webapp.zip .
-  #       working-directory: ../
-  #       id: zip
+      - name: Zip project
+        run: |
+          zip -r webapp.zip .
+        working-directory: ../
+        id: zip
 
-  #     - name: Set output variable
-  #       run: echo "WEBAPP_ZIP_PATH=/home/runner/work/webapp/webapp.zip" >> $GITHUB_ENV
+      - name: Set output variable
+        run: echo "WEBAPP_ZIP_PATH=/home/runner/work/webapp/webapp.zip" >> $GITHUB_ENV
 
-  #     - name: Print WEBAPP_ZIP_PATH
-  #       run: echo "WEBAPP_ZIP_PATH=${{ env.WEBAPP_ZIP_PATH }}"
+      - name: Print WEBAPP_ZIP_PATH
+        run: echo "WEBAPP_ZIP_PATH=${{ env.WEBAPP_ZIP_PATH }}"
 
-  #     - name: List contents of the directory
-  #       run: |
-  #           cd /home/runner/work/webapp/webapp
-  #           ls -la
+      - name: List contents of the directory
+        run: |
+            cd /home/runner/work/webapp/webapp
+            ls -la
 
-  #     - name: Run Packer build
-  #       run: |
-  #         packer init packer.pkr.hcl
-  #         packer build --force \
-  #         -var 'auth_file=data.json' \
-  #         -var 'project_path=/home/runner/work/webapp/webapp.zip' \
-  #         -var 'project_id=${{ secrets.PROJECT_ID }}' \
-  #         -var 'gcp_region=${{ secrets.GCP_REGION }}' \
-  #         -var 'gcp_zone=${{ secrets.GCP_ZONE }}' \
-  #         -var 'gcp_profile=${{ secrets.GCP_PROFILE }}' \
-  #         -var 'source_image=${{ secrets.SOURCE_IMAGE }}' \
-  #         -var 'ssh_username=${{ secrets.SSH_USERNAME }}' \
-  #         packer.pkr.hcl
+      - name: Run Packer build
+        run: |
+          packer init packer.pkr.hcl
+          packer build --force \
+          -var 'auth_file=data.json' \
+          -var 'project_path=/home/runner/work/webapp/webapp.zip' \
+          -var 'project_id=${{ secrets.PROJECT_ID }}' \
+          -var 'gcp_region=${{ secrets.GCP_REGION }}' \
+          -var 'gcp_zone=${{ secrets.GCP_ZONE }}' \
+          -var 'gcp_profile=${{ secrets.GCP_PROFILE }}' \
+          -var 'source_image=${{ secrets.SOURCE_IMAGE }}' \
+          -var 'ssh_username=${{ secrets.SSH_USERNAME }}' \
+          packer.pkr.hcl
 
   deploy:
-    # needs: Artifact_Config_Setup
+    needs: Artifact_Config_Setup
     
     runs-on: ubuntu-latest
     permissions:
@@ -79,10 +79,6 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      # - name: Terraform Apply
-      #   run: |
-      #     terraform init
-      #     terraform apply -auto-approve
       - name: Set timestamp
         id: timestamp
         run: |
@@ -145,7 +141,7 @@ jobs:
             --scopes=https://www.googleapis.com/auth/cloud-platform \
             --region=us-east1 \
             --tags=load-balancer \
-            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced,kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-03/cryptoKeys/VM-CMEK \
+            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced,kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-09/cryptoKeys/VM-CMEK \
             --no-shielded-secure-boot \
             --shielded-vtpm \
             --shielded-integrity-monitoring \
@@ -173,13 +169,7 @@ jobs:
       - name: Wait for Recreate Instances to Complete
         run: |
           echo "Waiting for the MIG update to complete..."
-          while true; do
-            STATUS=$(gcloud compute instance-groups managed describe webapp-instance-group --region=us-east1 --format="value(status)")
-              if [[ "$STATUS" == *"versionTarget.isReached=true"* && "$STATUS" == *"isStable=true"* ]]; then
-                echo "Update completed successfully."
-                break
-              else
-                echo "Update in progress..."
-              fi
-            sleep 30
-          done
+          gcloud compute instance-groups managed wait-until webapp-instance-group \
+            --version-target-reached \
+            --region=us-east1
+          echo "Update completed successfully."
