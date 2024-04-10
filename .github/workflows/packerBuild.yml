@@ -144,8 +144,8 @@ jobs:
             --service-account=monitoring-account@webapp-dev-414902.iam.gserviceaccount.com \
             --scopes=https://www.googleapis.com/auth/cloud-platform \
             --region=us-east1 \
-            --tags=load-balancer,allow-internet \
-            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced \
+            --tags=load-balancer \
+            --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/webapp-dev-414902/global/images/webapp-image,mode=rw,size=100,type=pd-balanced,kms-key=projects/webapp-dev-414902/locations/us-east1/keyRings/keyring-03/cryptoKeys/VM-CMEK \
             --no-shielded-secure-boot \
             --shielded-vtpm \
             --shielded-integrity-monitoring \
