@@ -4,6 +4,6 @@ const verifyRouter = require('./verify-route.js');
 
 module.exports = (app) => {
     app.use('/healthz', connectionRouter);
-    app.use('/v1/user/self', userRouter);
+    app.use('/v2/user/self', userRouter);
     app.use('/verify', verifyRouter);
 };
